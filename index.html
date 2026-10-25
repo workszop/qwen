@@ -143,10 +143,12 @@
     .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
     .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
     .nav { display: flex; gap: 4px; margin-left: 18px; }
+    .nav-toggle { display: none; margin-left: auto; }
     .nav-btn { border: none; background: transparent; color: var(--ink-2); font-family: var(--font-sans); font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s ease; }
     .nav-btn:hover { background: var(--paper-2); color: var(--ink); }
     .nav-btn.active { background: var(--yellow); color: var(--yellow-ink); }
     .edu-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); margin-left: auto; }
+    .nav-toggle + .edu-seg { margin-left: 0; }
     .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--ink-2); }
     .edu-seg button.active { background: var(--yellow); color: var(--yellow-ink); }
 
@@ -314,8 +316,10 @@
     @media (max-width: 768px) {
       main { padding: 0 16px 50px; }
       .edu-header-inner { padding: 6px 16px; flex-wrap: wrap; row-gap: 4px; }
-      .nav { margin-left: 0; order: 3; width: 100%; justify-content: flex-start; padding-bottom: 4px; overflow-x: auto; }
-      .nav-btn { font-size: 14px; padding: 7px 12px; }
+      .nav-toggle { display: inline-flex; }
+      .nav { display: none; order: 3; width: 100%; flex-direction: column; gap: 2px; margin: 4px 0 6px; padding: 6px; background: var(--paper-2); border-radius: var(--r-md); }
+      body[data-menu="1"] .nav { display: flex; }
+      .nav-btn { font-size: 15px; padding: 11px 14px; justify-content: flex-start; width: 100%; }
       .page-head { padding: 24px 0 22px; }
       .tiles { grid-template-columns: 1fr; }
       table { min-width: 560px; }
@@ -330,11 +334,12 @@
     <div class="edu-header-inner">
       <img class="edu-logo" alt="edulab" src="edulab-mark-ink.png">
       <span class="edu-wordmark">edulab</span>
-      <nav class="nav" aria-label="Menu">
+      <nav class="nav" id="mainNav" aria-label="Menu">
         <button type="button" class="nav-btn" data-open="dlgExp"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i><span data-i18n="navExp"></span></button>
         <button type="button" class="nav-btn" data-open="dlgSettings"><i data-lucide="sliders" class="ic" aria-hidden="true"></i><span data-i18n="navSettings"></span></button>
         <button type="button" class="nav-btn" data-open="dlgGloss"><i data-lucide="book-open" class="ic" aria-hidden="true"></i><span data-i18n="navGloss"></span></button>
       </nav>
+      <button type="button" class="btn-ghost btn-sm nav-toggle" id="btnMenu" aria-expanded="false" aria-controls="mainNav"><i data-lucide="menu" class="ic" aria-hidden="true"></i><span data-i18n="menu"></span></button>
       <div class="edu-seg" role="group" aria-label="Language">
         <button type="button" data-lang-btn="pl" class="active">PL</button>
         <button type="button" data-lang-btn="en">EN</button>
@@ -556,7 +561,7 @@
       pl: {
         title: "Mały model językowy w Twojej przeglądarce",
         lead: "Qwen3.5 0.8B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. To samo pytanie, dwa zestawy ustawień, dwie odpowiedzi obok siebie.",
-        navExp: "Eksperymenty", navSettings: "Ustawienia", navGloss: "Słownik",
+        navExp: "Eksperymenty", navSettings: "Ustawienia", navGloss: "Słownik", menu: "Menu",
         stateIdle: "nie załadowany", stateLoading: "pobieranie", stateCompiling: "kompilacja", stateReady: "gotowy", stateError: "błąd",
         load: "Załaduj model", loadNote: "Pierwsze pobranie ok. 850 MB, potem z pamięci podręcznej.",
         noGpu: "Ta przeglądarka nie udostępnia WebGPU. Użyj aktualnego Chrome lub Edge na komputerze z kartą graficzną.",
@@ -594,7 +599,7 @@
       en: {
         title: "A small language model in your browser",
         lead: "Qwen3.5 0.8B runs locally on your graphics card – no server, no API. Same question, two sets of settings, two answers side by side.",
-        navExp: "Experiments", navSettings: "Settings", navGloss: "Glossary",
+        navExp: "Experiments", navSettings: "Settings", navGloss: "Glossary", menu: "Menu",
         stateIdle: "not loaded", stateLoading: "downloading", stateCompiling: "compiling", stateReady: "ready", stateError: "error",
         load: "Load the model", loadNote: "First download about 850 MB, then from the browser cache.",
         noGpu: "This browser does not expose WebGPU. Use a current Chrome or Edge on a computer with a graphics card.",
@@ -1076,7 +1081,10 @@
     }
 
     // ─── Listeners ───
-    document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => openSheet(b.dataset.open)));
+    const btnMenu = $("btnMenu");
+    const setMenu = (open) => { el.body.dataset.menu = open ? "1" : "0"; btnMenu.setAttribute("aria-expanded", String(!!open)); };
+    btnMenu.addEventListener("click", () => setMenu(el.body.dataset.menu !== "1"));
+    document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => { setMenu(false); openSheet(b.dataset.open); }));
     document.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => openSheet("dlgSettings", b.dataset.edit)));
     document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
     document.querySelectorAll("dialog.sheet").forEach((d) => {
