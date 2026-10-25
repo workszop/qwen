@@ -120,6 +120,7 @@
     .edu-block, .edu-block h1, .edu-block h2, .edu-block h3, .edu-block h4, .edu-block p, .edu-block li, .edu-block small { color: inherit; }
     body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
 
+
     /* ============================================================
        Base
        ============================================================ */
@@ -127,41 +128,37 @@
     [hidden] { display: none !important; }
     html, body { margin: 0; padding: 0; }
     body { min-height: 100vh; display: flex; flex-direction: column; }
-    main { flex: 1; }
+    /* App workbench: full viewport width with gutters (reading pages keep the 1100px column) */
+    main { flex: 1; width: 100%; margin: 0; padding: 0 30px 70px; }
     :focus-visible { outline: 3px solid transparent; outline-offset: 2px; box-shadow: var(--focus-ring); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     .ic { width: 18px; height: 18px; flex: none; }
+    button { font: inherit; cursor: pointer; }
 
     /* ============================================================
-       Branded top menu
+       Branded top menu with nav
        ============================================================ */
     .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
-    .edu-header-inner { max-width: 1100px; margin: 0 auto; padding: 8px 30px; display: flex; align-items: center; gap: 12px; }
+    .edu-header-inner { width: 100%; padding: 8px 30px; display: flex; align-items: center; gap: 12px; }
     .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
     .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
+    .nav { display: flex; gap: 4px; margin-left: 18px; }
+    .nav-btn { border: none; background: transparent; color: var(--ink-2); font-family: var(--font-sans); font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s ease; }
+    .nav-btn:hover { background: var(--paper-2); color: var(--ink); }
+    .nav-btn.active { background: var(--yellow); color: var(--yellow-ink); }
     .edu-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); margin-left: auto; }
-    .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--ink-2); cursor: pointer; box-shadow: none; }
+    .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--ink-2); }
     .edu-seg button.active { background: var(--yellow); color: var(--yellow-ink); }
 
     /* ============================================================
        Page header
        ============================================================ */
-    .page-head { max-width: 1100px; margin: 0 auto; padding: 44px 30px 52px; text-align: left; }
+    .page-head { padding: 40px 0 28px; text-align: left; border-bottom: 1px solid var(--line-2); margin-bottom: 26px; }
     .app-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 5vw, 3.3rem); letter-spacing: -.025em; line-height: 1.05; color: var(--ink); margin: 0 0 14px; }
-    .edu-lead { font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
+    .edu-lead { font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 60rem; }
 
     /* ============================================================
-       Section bands
-       ============================================================ */
-    .sec { margin: 0; padding: 52px 0 60px; border-top: 1px solid var(--line); scroll-margin-top: 82px; }
-    .sec:nth-of-type(odd) { background: var(--paper-2); }
-    .sec > .wrap { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
-    .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
-    .sec-head h2 { margin: 0; }
-    .sec-head::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
-
-    /* ============================================================
-       Cards, badges, tones
+       Cards, badges, tones, chips
        ============================================================ */
     .card { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; }
     .card-head { padding: 14px 22px; background: var(--paper-2); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -170,7 +167,6 @@
     .card-foot { padding: 14px 22px; border-top: 1px dashed var(--line-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .tile-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .tile-h h3 { margin: 0; font-size: 18px; line-height: 1.3; }
-
     .tone-grape  { background: var(--grape-soft);  color: var(--grape-ink); }
     .tone-blue   { background: var(--blue-soft);   color: var(--blue-ink); }
     .tone-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
@@ -182,14 +178,12 @@
     .badge-lg { width: 46px; height: 46px; border-radius: var(--r-md); }
     .badge-lg .ic { width: 24px; height: 24px; }
     .badge.tone-ink { color: var(--yellow); }
-
     .edu-chip { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
     .edu-chip .ic { width: 13px; height: 13px; }
 
     /* ============================================================
        Buttons
        ============================================================ */
-    button { font: inherit; cursor: pointer; }
     .edu-btn { font-family: var(--font-display); font-weight: 600; font-size: 1rem; background: var(--yellow); color: var(--on-primary); border: none; border-radius: var(--r-pill); padding: 12px 22px; box-shadow: var(--shadow-primary); display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s ease, transform .12s cubic-bezier(.32,.72,.32,1); }
     .edu-btn:hover  { background: var(--yellow-600); }
     .edu-btn:active { transform: scale(.96); }
@@ -203,31 +197,82 @@
     .btn-sm { padding: 7px 14px; font-size: .85rem; }
 
     /* ============================================================
-       Model card (landing / loading)
+       Model bar
        ============================================================ */
-    .model-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: stretch; }
-    .model-facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
-    .model-facts li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-    .model-facts .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-    .model-facts .v { font-family: var(--font-sans); font-weight: 600; color: var(--ink); font-size: 15px; }
+    .model-bar .card-head { flex-wrap: wrap; }
+    .model-bar .card-body { padding: 14px 22px; }
+    .model-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .progress { height: 10px; border-radius: var(--r-pill); background: var(--paper-3); overflow: hidden; }
     .progress > span { display: block; height: 100%; width: 0; background: var(--yellow); border-radius: var(--r-pill); transition: width .25s ease; }
     .progress-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
     .progress-meta b { color: var(--ink); font-weight: 500; }
-    .callout { border-radius: var(--r-md); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; }
+    .callout { border-radius: var(--r-md); padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
     .callout p { margin: 0; font-size: 15px; line-height: 1.5; }
     .callout .ic { margin-top: 2px; }
-    .dark-panel { background: var(--ink); color: var(--paper); border-radius: var(--r-xl); padding: 26px 28px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
-    .dark-panel .edu-overline { color: rgba(255,255,255,.62); }
-    .dark-panel .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.14); font-size: 15px; }
-    .dark-panel .row:last-child { border-bottom: none; }
-    .dark-panel .row b { font-family: var(--font-display); font-weight: 600; font-size: 20px; color: var(--yellow); }
 
     /* ============================================================
-       Workbench: parameters + chat
+       Workbench: panels + composer
        ============================================================ */
-    .bench { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: stretch; }
-    .params .card-body { padding: 6px 22px 18px; }
+    .bench { margin-top: 20px; }
+    .panels { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    body[data-compare="1"] .panels { grid-template-columns: 1fr 1fr; }
+    .panel { min-height: 420px; }
+    .panel .card-head { align-items: flex-start; }
+    .panel-title { display: flex; align-items: center; gap: 10px; }
+    .panel-title .letter { font-family: var(--font-display); font-weight: 800; font-size: 16px; width: 34px; height: 34px; border-radius: var(--r-sm); display: inline-grid; place-items: center; }
+    .panel-summary { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .panel-summary .edu-overline { margin: 0; font-size: 11px; }
+    .panel-summary .sum { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); letter-spacing: .02em; line-height: 1.5; }
+    .panel-summary .sum b { color: var(--ink); font-weight: 500; }
+    .panel-summary .sys { font-size: 13px; color: var(--ink-2); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .panel-summary .variant { font-size: 13px; color: var(--ink); line-height: 1.4; }
+    .panel-summary .variant .lbl { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-right: 6px; }
+    .messages { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 320px; max-height: 62vh; overflow-y: auto; }
+    .msg { max-width: 88%; padding: 12px 15px; border-radius: var(--r-lg); line-height: 1.55; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .msg.user { align-self: flex-end; background: var(--yellow-soft); color: var(--yellow-ink); border-bottom-right-radius: var(--r-xs); }
+    .msg.assistant { align-self: flex-start; background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); border-bottom-left-radius: var(--r-xs); box-shadow: var(--shadow-sm); }
+    .msg.assistant.error { background: var(--red-soft); color: var(--red-ink); border-color: var(--red-soft); }
+    .msg img { max-width: 220px; border-radius: var(--r-md); display: block; margin-bottom: 8px; border: 1px solid var(--line-2); }
+    .msg .think { margin: 0 0 10px; border-radius: var(--r-sm); background: var(--paper-2); border: 1px solid var(--line-2); font-size: 14px; color: var(--ink-2); }
+    .msg .think summary { padding: 8px 12px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); list-style: none; display: flex; align-items: center; gap: 8px; }
+    .msg .think summary::-webkit-details-marker { display: none; }
+    .msg .think .think-body { padding: 0 12px 10px; white-space: pre-wrap; }
+    .msg .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line-2); font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: var(--ink-3); }
+    .msg.assistant.error .meta { border-color: rgba(255,255,255,.4); color: var(--red-ink); }
+    .msg.empty { align-self: stretch; max-width: none; background: var(--paper-2); color: var(--ink-2); border: 1px dashed var(--line-2); text-align: center; padding: 26px 18px; font-size: 15px; }
+    .cursor::after { content: "▍"; color: var(--ink-3); animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .composer-card { margin-top: 18px; }
+    .composer { padding: 14px 22px; display: flex; gap: 10px; align-items: flex-end; }
+    .composer textarea { flex: 1; min-height: 46px; max-height: 180px; resize: none; }
+    .attach-preview { display: flex; align-items: center; gap: 10px; padding: 10px 22px 0; font-size: 13px; color: var(--ink-2); }
+    .attach-preview img { width: 40px; height: 40px; object-fit: cover; border-radius: var(--r-xs); border: 1px solid var(--line-2); }
+    .attach-preview button { margin-left: auto; }
+    .composer-card .card-foot { background: var(--paper-2); font-size: 13px; color: var(--ink-3); }
+    .kbd { font-family: var(--font-mono); font-size: 11px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); color: var(--ink); background: var(--surface); }
+    .input, textarea.input { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: inherit; font-size: 15px; background: var(--surface); color: var(--ink); resize: vertical; }
+    .input::placeholder { color: var(--ink-3); }
+
+    /* ============================================================
+       Sheets (dialogs): experiments, settings, glossary
+       ============================================================ */
+    dialog.sheet { border: none; padding: 0; background: transparent; max-width: min(860px, calc(100vw - 32px)); width: 100%; max-height: calc(100vh - 48px); margin: 24px auto; }
+    dialog.sheet::backdrop { background: rgba(28,25,23,.45); }
+    dialog.sheet .card { max-height: calc(100vh - 48px); }
+    dialog.sheet .card-body { overflow-y: auto; }
+    .sheet-close { background: transparent; border: 1px solid var(--line-strong); border-radius: var(--r-pill); width: 36px; height: 36px; display: inline-grid; place-items: center; color: var(--ink); }
+    .sheet-close:hover { background: var(--paper-3); }
+
+    .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .tiles .card-body p { margin: 0; font-size: 15px; }
+    .tiles .card-head h3 { font-size: 17px; }
+    .tiles .card-foot { justify-content: space-between; }
+    .tiles .ab { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); line-height: 1.6; margin: 12px 0 0; }
+    .tiles .ab b { color: var(--ink); font-weight: 500; }
+
+    .settings-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+    .settings-top .lbl { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); margin-right: 10px; }
     .pgroup { padding: 14px 0; border-bottom: 1px solid var(--line); }
     .pgroup:last-child { border-bottom: none; }
     .pgroup-h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -239,97 +284,57 @@
     .field label, .field .label { font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
     .field .val { font-family: var(--font-mono); font-size: 13px; color: var(--ink); font-weight: 500; min-width: 3.5ch; text-align: right; font-variant-numeric: tabular-nums; }
     .field .hint { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
-    .input, textarea.input { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: inherit; font-size: 15px; background: var(--surface); color: var(--ink); resize: vertical; }
-    .input::placeholder { color: var(--ink-3); }
     input[type="range"] { width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: var(--track); border-radius: var(--r-pill); margin: 8px 0 2px; }
     input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--shadow-sm); cursor: pointer; }
     input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--shadow-sm); cursor: pointer; }
     input[type="range"]:disabled { opacity: .4; }
     .num { width: 92px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); font-family: var(--font-mono); font-size: 14px; color: var(--ink); background: var(--surface); }
     .switch { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); }
-    .switch button { border: none; background: transparent; padding: 6px 12px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 13px; color: var(--ink-2); box-shadow: none; }
+    .switch button { border: none; background: transparent; padding: 6px 12px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 13px; color: var(--ink-2); }
     .switch button.active { background: var(--yellow); color: var(--yellow-ink); }
     .switch.sw-blue button.active { background: var(--blue-soft); color: var(--blue-ink); }
-
-    .chat { min-height: 640px; }
-    .chat-head-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .messages { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 380px; max-height: 72vh; overflow-y: auto; }
-    .msg { max-width: 82%; padding: 13px 16px; border-radius: var(--r-lg); line-height: 1.55; font-size: 15.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .msg.user { align-self: flex-end; background: var(--yellow-soft); color: var(--yellow-ink); border-bottom-right-radius: var(--r-xs); }
-    .msg.assistant { align-self: flex-start; background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); border-bottom-left-radius: var(--r-xs); box-shadow: var(--shadow-sm); }
-    .msg.assistant.error { background: var(--red-soft); color: var(--red-ink); border-color: var(--red-soft); }
-    .msg img { max-width: 240px; border-radius: var(--r-md); display: block; margin-bottom: 8px; border: 1px solid var(--line-2); }
-    .msg .think { margin: 0 0 10px; border-radius: var(--r-sm); background: var(--paper-2); border: 1px solid var(--line-2); font-size: 14px; color: var(--ink-2); }
-    .msg .think summary { padding: 8px 12px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); list-style: none; display: flex; align-items: center; gap: 8px; }
-    .msg .think summary::-webkit-details-marker { display: none; }
-    .msg .think .think-body { padding: 0 12px 10px; white-space: pre-wrap; }
-    .msg .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line-2); font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: var(--ink-3); }
-    .msg.assistant.error .meta { border-color: rgba(255,255,255,.4); color: var(--red-ink); }
-    .msg .meta span { white-space: nowrap; }
-    .msg.empty { align-self: stretch; max-width: none; background: var(--paper-2); color: var(--ink-2); border: 1px dashed var(--line-2); text-align: center; padding: 28px 20px; font-size: 15px; }
-    .cursor::after { content: "▍"; color: var(--ink-3); animation: blink 1s steps(1) infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-    .composer { padding: 14px 22px 10px; display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid var(--line); background: var(--paper-2); }
-    .composer textarea { flex: 1; min-height: 46px; max-height: 180px; resize: none; }
-    .attach-preview { display: flex; align-items: center; gap: 10px; padding: 8px 22px 0; font-size: 13px; color: var(--ink-2); background: var(--paper-2); }
-    .attach-preview img { width: 40px; height: 40px; object-fit: cover; border-radius: var(--r-xs); border: 1px solid var(--line-2); }
-    .attach-preview button { margin-left: auto; }
-    .chat .card-foot { background: var(--paper-2); font-size: 13px; color: var(--ink-3); }
-    .kbd { font-family: var(--font-mono); font-size: 11px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); color: var(--ink); background: var(--surface); }
     .disabled-note { opacity: .5; pointer-events: none; }
 
-    /* ============================================================
-       Experiments tiles
-       ============================================================ */
-    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .tiles .card-body p { margin: 0 0 12px; font-size: 15px; }
-    .tiles .card-body p:last-child { margin: 0; }
-    .tiles .settings { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tiles .settings .edu-chip { background: var(--paper-3); color: var(--ink); }
-    .tiles .card-foot { justify-content: flex-start; }
-
-    /* ============================================================
-       Glossary table
-       ============================================================ */
-    .table-card .card-body { padding: 0; }
     table { width: 100%; border-collapse: collapse; font-size: 15px; }
     th { text-align: left; padding: 12px 16px; background: var(--paper-3); border-bottom: 1px solid var(--line-2); font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
     td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; line-height: 1.5; }
     tbody tr:nth-child(even) td { background: var(--paper-2); }
     tbody tr:last-child td { border-bottom: none; }
     td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
-    td.mono { font-family: var(--font-mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
+    .table-wrap { overflow-x: auto; margin: 0 -22px -20px; }
 
     footer.site { border-top: 1px solid var(--line-2); }
-    footer.site .wrap { max-width: 1100px; margin: 0 auto; padding: 22px 30px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-3); }
+    footer.site .wrap { width: 100%; padding: 22px 30px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-3); }
     footer.site a { color: var(--ink); }
 
     /* ============================================================
        Responsive
        ============================================================ */
-    @media (max-width: 1080px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 900px)  { .bench { grid-template-columns: 1fr; } .model-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { body[data-compare="1"] .panels { grid-template-columns: 1fr; } }
     @media (max-width: 768px) {
-      .edu-header-inner { padding: 6px 16px; }
-      .page-head { padding: 28px 16px 36px; }
-      .sec { padding: 36px 0 44px; } .sec > .wrap { padding: 0 16px; }
-      .sec-head { flex-direction: row; flex-wrap: wrap; align-items: center; }
-      .sec-head h2 { flex: 1; min-width: 0; }
-      .sec-head::after { flex: 1 0 100%; }
+      main { padding: 0 16px 50px; }
+      .edu-header-inner { padding: 6px 16px; flex-wrap: wrap; row-gap: 4px; }
+      .nav { margin-left: 0; order: 3; width: 100%; justify-content: flex-start; padding-bottom: 4px; overflow-x: auto; }
+      .nav-btn { font-size: 14px; padding: 7px 12px; }
+      .page-head { padding: 24px 0 22px; }
       .tiles { grid-template-columns: 1fr; }
-      .table-card .card-body { overflow-x: auto; } table { min-width: 640px; }
-      .model-facts { grid-template-columns: 1fr; }
+      table { min-width: 560px; }
       .msg { max-width: 94%; }
       footer.site .wrap { padding: 18px 16px; }
     }
   </style>
 </head>
-<body class="edu" data-state="idle" data-lang="pl" data-progress="0">
+<body class="edu" data-state="idle" data-lang="pl" data-progress="0" data-compare="0">
 
   <header class="edu-header">
     <div class="edu-header-inner">
       <img class="edu-logo" alt="edulab" src="edulab-mark-ink.png">
       <span class="edu-wordmark">edulab</span>
+      <nav class="nav" aria-label="Menu">
+        <button type="button" class="nav-btn" data-open="dlgExp"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i><span data-i18n="navExp"></span></button>
+        <button type="button" class="nav-btn" data-open="dlgSettings"><i data-lucide="sliders" class="ic" aria-hidden="true"></i><span data-i18n="navSettings"></span></button>
+        <button type="button" class="nav-btn" data-open="dlgGloss"><i data-lucide="book-open" class="ic" aria-hidden="true"></i><span data-i18n="navGloss"></span></button>
+      </nav>
       <div class="edu-seg" role="group" aria-label="Language">
         <button type="button" data-lang-btn="pl" class="active">PL</button>
         <button type="button" data-lang-btn="en">EN</button>
@@ -343,196 +348,181 @@
       <p class="edu-lead" data-i18n="lead"></p>
     </header>
 
-    <!-- ─── Model ─── -->
-    <section class="sec" id="sec-model">
-      <div class="wrap">
-        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secModel"></h2></div>
-        <div class="model-grid">
-          <div class="card" id="modelCard">
-            <div class="card-head">
-              <span class="tile-h"><span class="badge tone-blue"><i data-lucide="download" class="ic" aria-hidden="true"></i></span><h3>Qwen3.5 · 0.8B</h3></span>
-              <span class="edu-chip tone-stone" id="modelChip" data-i18n="stateIdle"></span>
-            </div>
-            <div class="card-body">
-              <ul class="model-facts">
-                <li><span class="k" data-i18n="fParams"></span><span class="v">0.8B</span></li>
-                <li><span class="k" data-i18n="fDownload"></span><span class="v">≈ 850 MB</span></li>
-                <li><span class="k" data-i18n="fRuntime"></span><span class="v">WebGPU · ONNX</span></li>
-                <li><span class="k" data-i18n="fLangs"></span><span class="v" data-i18n="fLangsV"></span></li>
-              </ul>
-              <div id="progressWrap" hidden style="margin-top:18px">
-                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><span></span></div>
-                <div class="progress-meta"><span id="progressFile"></span><b id="progressPct">0%</b></div>
-              </div>
-              <div id="gpuWarn" class="callout tone-red edu-block" hidden style="margin-top:18px">
-                <i data-lucide="info" class="ic" aria-hidden="true"></i><p data-i18n="noGpu"></p>
-              </div>
-              <div id="loadError" class="callout tone-red edu-block" hidden style="margin-top:18px">
-                <i data-lucide="info" class="ic" aria-hidden="true"></i><p id="loadErrorText"></p>
-              </div>
-            </div>
-            <div class="card-foot">
-              <button class="edu-btn" id="btnLoad"><i data-lucide="download" class="ic" aria-hidden="true"></i><span data-i18n="load"></span></button>
-              <span class="edu-caption" data-i18n="loadNote"></span>
-            </div>
-          </div>
-          <div class="dark-panel edu-block">
-            <p class="edu-overline" data-i18n="whyTitle"></p>
-            <div class="row"><span data-i18n="why1"></span><b>0</b></div>
-            <div class="row"><span data-i18n="why2"></span><b>100%</b></div>
-            <div class="row"><span data-i18n="why3"></span><b id="statTps">–</b></div>
-          </div>
+    <!-- ─── Model bar ─── -->
+    <section class="card model-bar" id="modelCard" aria-labelledby="modelTitle">
+      <div class="card-head">
+        <span class="tile-h"><span class="badge tone-blue"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 id="modelTitle">Qwen3.5 · 0.8B · WebGPU</h3><span class="edu-chip tone-stone" id="modelChip" data-i18n="stateIdle"></span></span>
+        <div class="model-actions">
+          <span class="edu-caption" id="modelNote" data-i18n="loadNote"></span>
+          <button class="edu-btn" id="btnLoad"><i data-lucide="download" class="ic" aria-hidden="true"></i><span data-i18n="load"></span></button>
         </div>
+      </div>
+      <div class="card-body" id="modelBody" hidden>
+        <div id="progressWrap" hidden>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><span></span></div>
+          <div class="progress-meta"><span id="progressFile"></span><b id="progressPct">0%</b></div>
+        </div>
+        <div id="gpuWarn" class="callout tone-red edu-block" hidden><i data-lucide="info" class="ic" aria-hidden="true"></i><p data-i18n="noGpu"></p></div>
+        <div id="loadError" class="callout tone-red edu-block" hidden><i data-lucide="info" class="ic" aria-hidden="true"></i><p id="loadErrorText"></p></div>
       </div>
     </section>
 
     <!-- ─── Workbench ─── -->
-    <section class="sec" id="sec-bench">
-      <div class="wrap">
-        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="sliders" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secBench"></h2></div>
-        <div class="bench">
-
-          <div class="card params" id="paramsCard">
-            <div class="card-head">
-              <span class="tile-h"><span class="badge tone-grape"><i data-lucide="sliders" class="ic" aria-hidden="true"></i></span><h3 data-i18n="params"></h3></span>
-              <button class="btn-ghost btn-sm" id="btnReset" type="button"><span data-i18n="reset"></span></button>
+    <section class="bench" aria-label="Workbench">
+      <div class="panels" id="panels">
+        <article class="card panel" data-panel="a">
+          <div class="card-head">
+            <div class="panel-title"><span class="letter tone-ink">A</span>
+              <div class="panel-summary"><span class="sum" data-sum></span><span class="sys" data-sys></span><span class="variant" data-variant hidden></span></div>
             </div>
-            <div class="card-body">
-
-              <div class="pgroup">
-                <div class="pgroup-h"><span class="badge tone-blue"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gPrompt"></span></div>
-                <div class="field">
-                  <div class="field-row"><label for="sysInput" data-i18n="sysPrompt"></label></div>
-                  <textarea class="input" id="sysInput" rows="3"></textarea>
-                  <p class="hint" data-i18n="sysHint"></p>
-                </div>
-                <div class="field">
-                  <div class="field-row"><span class="label" data-i18n="memory"></span>
-                    <div class="switch sw-blue" role="group"><button type="button" data-sw="memory" data-val="0" class="active" data-i18n="off"></button><button type="button" data-sw="memory" data-val="1" data-i18n="on"></button></div>
-                  </div>
-                  <p class="hint" data-i18n="memoryHint"></p>
-                </div>
-                <div class="field">
-                  <div class="field-row"><span class="label" data-i18n="thinking"></span>
-                    <div class="switch sw-blue" role="group"><button type="button" data-sw="thinking" data-val="0" class="active" data-i18n="off"></button><button type="button" data-sw="thinking" data-val="1" data-i18n="on"></button></div>
-                  </div>
-                  <p class="hint" data-i18n="thinkingHint"></p>
-                </div>
-              </div>
-
-              <div class="pgroup">
-                <div class="pgroup-h"><span class="badge tone-yellow"><i data-lucide="dice-5" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gSampling"></span></div>
-                <div class="field">
-                  <div class="field-row"><span class="label" data-i18n="decoding"></span>
-                    <div class="switch" role="group"><button type="button" data-sw="sample" data-val="0" data-i18n="greedy"></button><button type="button" data-sw="sample" data-val="1" class="active" data-i18n="sampling"></button></div>
-                  </div>
-                  <p class="hint" data-i18n="decodingHint"></p>
-                </div>
-                <div class="field" data-needs-sample>
-                  <div class="field-row"><label for="tempInput" data-i18n="temperature"></label><span class="val" id="tempVal">0.7</span></div>
-                  <input type="range" id="tempInput" min="0.1" max="2" step="0.1" value="0.7" />
-                  <p class="hint" data-i18n="tempHint"></p>
-                </div>
-                <div class="field" data-needs-sample>
-                  <div class="field-row"><label for="topkInput">Top-k</label><span class="val" id="topkVal">20</span></div>
-                  <input type="range" id="topkInput" min="0" max="100" step="1" value="20" />
-                  <p class="hint" data-i18n="topkHint"></p>
-                </div>
-                <div class="field" data-needs-sample>
-                  <div class="field-row"><label for="toppInput">Top-p</label><span class="val" id="toppVal">0.95</span></div>
-                  <input type="range" id="toppInput" min="0.05" max="1" step="0.05" value="0.95" />
-                  <p class="hint" data-i18n="toppHint"></p>
-                </div>
-              </div>
-
-              <div class="pgroup">
-                <div class="pgroup-h"><span class="badge tone-green"><i data-lucide="repeat" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gRepeat"></span></div>
-                <div class="field">
-                  <div class="field-row"><label for="repInput" data-i18n="repPenalty"></label><span class="val" id="repVal">1.0</span></div>
-                  <input type="range" id="repInput" min="1" max="2" step="0.05" value="1" />
-                  <p class="hint" data-i18n="repHint"></p>
-                </div>
-                <div class="field">
-                  <div class="field-row"><label for="ngramInput" data-i18n="noRepeat"></label><span class="val" id="ngramVal">0</span></div>
-                  <input type="range" id="ngramInput" min="0" max="6" step="1" value="0" />
-                  <p class="hint" data-i18n="noRepeatHint"></p>
-                </div>
-              </div>
-
-              <div class="pgroup">
-                <div class="pgroup-h"><span class="badge tone-red"><i data-lucide="ruler" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gLength"></span></div>
-                <div class="field">
-                  <div class="field-row"><label for="maxTok" data-i18n="maxTokens"></label><input class="num" type="number" id="maxTok" min="1" max="2048" value="200" /></div>
-                  <p class="hint" data-i18n="maxHint"></p>
-                </div>
-                <div class="field">
-                  <div class="field-row"><label for="minTok" data-i18n="minTokens"></label><input class="num" type="number" id="minTok" min="0" max="512" value="0" /></div>
-                  <p class="hint" data-i18n="minHint"></p>
-                </div>
-              </div>
-
-            </div>
+            <button class="btn-ghost btn-sm" type="button" data-edit="a"><i data-lucide="sliders" class="ic" aria-hidden="true"></i><span data-i18n="edit"></span></button>
           </div>
-
-          <div class="card chat" id="chatCard">
-            <div class="card-head">
-              <span class="tile-h"><span class="badge tone-yellow"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="chat"></h3></span>
-              <div class="chat-head-meta">
-                <span class="edu-chip tone-stone" id="chatState" data-i18n="chatIdle"></span>
-                <button class="btn-ghost btn-sm" id="btnClear" type="button"><i data-lucide="eraser" class="ic" aria-hidden="true"></i><span data-i18n="clear"></span></button>
-              </div>
+          <div class="messages" data-messages aria-live="polite" aria-relevant="additions text"><div class="msg empty" data-empty data-i18n="emptyChat"></div></div>
+        </article>
+        <article class="card panel" data-panel="b" hidden>
+          <div class="card-head">
+            <div class="panel-title"><span class="letter tone-blue">B</span>
+              <div class="panel-summary"><span class="sum" data-sum></span><span class="sys" data-sys></span><span class="variant" data-variant hidden></span></div>
             </div>
-            <div class="messages" id="messages" aria-live="polite" aria-relevant="additions text">
-              <div class="msg empty" id="emptyMsg" data-i18n="emptyChat"></div>
-            </div>
-            <div class="attach-preview" id="attachPreview" hidden>
-              <img id="attachImg" alt="">
-              <span data-i18n="attached"></span>
-              <button class="btn-ghost btn-sm" id="btnDetach" type="button" data-i18n="remove"></button>
-            </div>
-            <div class="composer">
-              <input type="file" id="fileInput" accept="image/*" hidden />
-              <button class="btn-ghost btn-icon" id="btnAttach" type="button" aria-label="Attach image"><i data-lucide="paperclip" class="ic" aria-hidden="true"></i></button>
-              <textarea class="input" id="msgInput" rows="1" data-i18n-placeholder="placeholder"></textarea>
-              <button class="btn-ghost btn-icon" id="btnRepeat" type="button" aria-label="Send three times"><span style="font-family:var(--font-mono);font-weight:500">×3</span></button>
-              <button class="edu-btn btn-icon" id="btnSend" type="button" disabled aria-label="Send"><i data-lucide="send" class="ic" aria-hidden="true"></i></button>
-              <button class="edu-btn btn-icon btn-danger" id="btnStop" type="button" hidden aria-label="Stop"><i data-lucide="square" class="ic" aria-hidden="true"></i></button>
-            </div>
-            <div class="card-foot">
-              <span data-i18n-html="shortcuts"></span>
-              <span class="edu-caption" data-i18n="localNote"></span>
-            </div>
+            <button class="btn-ghost btn-sm" type="button" data-edit="b"><i data-lucide="sliders" class="ic" aria-hidden="true"></i><span data-i18n="edit"></span></button>
           </div>
+          <div class="messages" data-messages aria-live="polite" aria-relevant="additions text"><div class="msg empty" data-empty data-i18n="emptyChatB"></div></div>
+        </article>
+      </div>
 
+      <div class="card composer-card">
+        <div class="card-head">
+          <span class="tile-h"><span class="badge tone-yellow"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="composer"></h3><span class="edu-chip tone-stone" id="chatState" data-i18n="chatIdle"></span></span>
+          <div class="model-actions">
+            <button class="btn-ghost btn-sm" id="btnCompare" type="button"><i data-lucide="columns-2" class="ic" aria-hidden="true"></i><span data-i18n="compareOn"></span></button>
+            <button class="btn-ghost btn-sm" id="btnClear" type="button"><i data-lucide="eraser" class="ic" aria-hidden="true"></i><span data-i18n="clear"></span></button>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ─── Experiments ─── -->
-    <section class="sec" id="sec-exp">
-      <div class="wrap">
-        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secExp"></h2></div>
-        <p class="edu-body-lg" style="margin:0 0 24px" data-i18n="expLead"></p>
-        <div class="tiles" id="tiles"></div>
-      </div>
-    </section>
-
-    <!-- ─── Glossary ─── -->
-    <section class="sec" id="sec-gloss">
-      <div class="wrap">
-        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secGloss"></h2></div>
-        <div class="card table-card">
-          <div class="card-head"><span class="tile-h"><span class="badge tone-blue"><i data-lucide="list-filter" class="ic" aria-hidden="true"></i></span><h3 data-i18n="glossTitle"></h3></span></div>
-          <div class="card-body">
-            <table>
-              <thead><tr><th data-i18n="thParam"></th><th data-i18n="thWhere"></th><th data-i18n="thWhat"></th><th data-i18n="thTry"></th></tr></thead>
-              <tbody id="glossBody"></tbody>
-            </table>
-          </div>
+        <div class="attach-preview" id="attachPreview" hidden>
+          <img id="attachImg" alt=""><span data-i18n="attached"></span>
+          <button class="btn-ghost btn-sm" id="btnDetach" type="button" data-i18n="remove"></button>
+        </div>
+        <div class="composer">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <button class="btn-ghost btn-icon" id="btnAttach" type="button" aria-label="Attach image"><i data-lucide="paperclip" class="ic" aria-hidden="true"></i></button>
+          <textarea class="input" id="msgInput" rows="1" data-i18n-placeholder="placeholder"></textarea>
+          <button class="btn-ghost btn-icon" id="btnRepeat" type="button" aria-label="Send three times"><span style="font-family:var(--font-mono);font-weight:500">×3</span></button>
+          <button class="edu-btn btn-icon" id="btnSend" type="button" disabled aria-label="Send"><i data-lucide="send" class="ic" aria-hidden="true"></i></button>
+          <button class="edu-btn btn-icon btn-danger" id="btnStop" type="button" hidden aria-label="Stop"><i data-lucide="square" class="ic" aria-hidden="true"></i></button>
+        </div>
+        <div class="card-foot">
+          <span data-i18n-html="shortcuts"></span>
+          <span class="edu-caption" data-i18n="localNote"></span>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- ─── Experiments sheet ─── -->
+  <dialog class="sheet" id="dlgExp" aria-labelledby="dlgExpTitle">
+    <div class="card">
+      <div class="card-head">
+        <span class="tile-h"><span class="badge tone-ink"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i></span><h3 id="dlgExpTitle" data-i18n="navExp"></h3></span>
+        <button class="sheet-close" type="button" data-close aria-label="Close"><i data-lucide="x" class="ic" aria-hidden="true"></i></button>
+      </div>
+      <div class="card-body">
+        <p class="edu-p" style="margin:0 0 18px" data-i18n="expLead"></p>
+        <div class="tiles" id="tiles"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─── Settings sheet ─── -->
+  <dialog class="sheet" id="dlgSettings" aria-labelledby="dlgSetTitle">
+    <div class="card">
+      <div class="card-head">
+        <span class="tile-h"><span class="badge tone-ink"><i data-lucide="sliders" class="ic" aria-hidden="true"></i></span><h3 id="dlgSetTitle" data-i18n="navSettings"></h3></span>
+        <button class="sheet-close" type="button" data-close aria-label="Close"><i data-lucide="x" class="ic" aria-hidden="true"></i></button>
+      </div>
+      <div class="card-body">
+        <div class="settings-top">
+          <div><span class="lbl" data-i18n="editPanel"></span>
+            <div class="switch" role="group" id="panelPick"><button type="button" data-pick="a" class="active">A</button><button type="button" data-pick="b">B</button></div>
+          </div>
+          <div><span class="lbl" data-i18n="compare"></span>
+            <div class="switch sw-blue" role="group"><button type="button" data-sw-compare="0" class="active" data-i18n="off"></button><button type="button" data-sw-compare="1" data-i18n="on"></button></div>
+          </div>
+          <button class="btn-ghost btn-sm" id="btnReset" type="button" data-i18n="reset"></button>
+        </div>
+
+        <div class="pgroup">
+          <div class="pgroup-h"><span class="badge tone-blue"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gPrompt"></span></div>
+          <div class="field">
+            <div class="field-row"><label for="sysInput" data-i18n="sysPrompt"></label></div>
+            <textarea class="input" id="sysInput" rows="3"></textarea>
+            <p class="hint" data-i18n="sysHint"></p>
+          </div>
+          <div class="field">
+            <div class="field-row"><span class="label" data-i18n="memory"></span>
+              <div class="switch sw-blue" role="group"><button type="button" data-sw="memory" data-val="0" data-i18n="off"></button><button type="button" data-sw="memory" data-val="1" data-i18n="on"></button></div>
+            </div>
+            <p class="hint" data-i18n="memoryHint"></p>
+          </div>
+          <div class="field">
+            <div class="field-row"><span class="label" data-i18n="thinking"></span>
+              <div class="switch sw-blue" role="group"><button type="button" data-sw="thinking" data-val="0" data-i18n="off"></button><button type="button" data-sw="thinking" data-val="1" data-i18n="on"></button></div>
+            </div>
+            <p class="hint" data-i18n="thinkingHint"></p>
+          </div>
+        </div>
+
+        <div class="pgroup">
+          <div class="pgroup-h"><span class="badge tone-yellow"><i data-lucide="dice-5" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gSampling"></span></div>
+          <div class="field">
+            <div class="field-row"><span class="label" data-i18n="decoding"></span>
+              <div class="switch" role="group"><button type="button" data-sw="sample" data-val="0" data-i18n="greedy"></button><button type="button" data-sw="sample" data-val="1" data-i18n="sampling"></button></div>
+            </div>
+            <p class="hint" data-i18n="decodingHint"></p>
+          </div>
+          <div class="field" data-needs-sample>
+            <div class="field-row"><label for="tempInput" data-i18n="temperature"></label><span class="val" id="tempVal">0.7</span></div>
+            <input type="range" id="tempInput" min="0.1" max="2" step="0.1" value="0.7" />
+            <p class="hint" data-i18n="tempHint"></p>
+          </div>
+        </div>
+
+        <div class="pgroup">
+          <div class="pgroup-h"><span class="badge tone-red"><i data-lucide="ruler" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gLength"></span></div>
+          <div class="field">
+            <div class="field-row"><label for="maxTok" data-i18n="maxTokens"></label><input class="num" type="number" id="maxTok" min="1" max="2048" value="200" /></div>
+            <p class="hint" data-i18n="maxHint"></p>
+          </div>
+        </div>
+
+        <div class="pgroup" id="variantGroup" hidden>
+          <div class="pgroup-h"><span class="badge tone-green"><i data-lucide="languages" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gVariant"></span></div>
+          <div class="field">
+            <div class="field-row"><label for="variantInput" data-i18n="variant"></label></div>
+            <textarea class="input" id="variantInput" rows="2"></textarea>
+            <p class="hint" data-i18n="variantHint"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─── Glossary sheet ─── -->
+  <dialog class="sheet" id="dlgGloss" aria-labelledby="dlgGlossTitle">
+    <div class="card">
+      <div class="card-head">
+        <span class="tile-h"><span class="badge tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h3 id="dlgGlossTitle" data-i18n="navGloss"></h3></span>
+        <button class="sheet-close" type="button" data-close aria-label="Close"><i data-lucide="x" class="ic" aria-hidden="true"></i></button>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th data-i18n="thParam"></th><th data-i18n="thWhat"></th><th data-i18n="thTry"></th></tr></thead>
+            <tbody id="glossBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <footer class="site">
     <div class="wrap">
@@ -559,40 +549,21 @@
     const IMAGE_SIZE = 448;
     const FONT_WAIT_MS = 1500;
     const BRAND_FONTS = ['400 1em Outfit', '700 1em Outfit', '400 1em "IBM Plex Sans"', '600 1em "IBM Plex Sans"', '400 1em "Roboto Mono"'];
-
-    const DEFAULTS = {
-      sys: { pl: "Jesteś pomocnym asystentem. Odpowiadaj krótko.", en: "You are a helpful assistant. Answer briefly." },
-      memory: 0, thinking: 0, sample: 1,
-      temp: 0.7, topk: 20, topp: 0.95, rep: 1.0, ngram: 0, maxTok: 200, minTok: 0,
-    };
+    const SYS_DEFAULT = { pl: "Jesteś pomocnym asystentem. Odpowiadaj krótko.", en: "You are a helpful assistant. Answer briefly." };
+    const PANEL_DEFAULT = { sys: "", memory: 0, thinking: 0, sample: 1, temp: 0.7, maxTok: 200, variant: "" };
 
     const T = {
       pl: {
         title: "Mały model językowy w Twojej przeglądarce",
-        lead: "Qwen3.5 0.8B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. Zmieniaj parametry generowania i obserwuj, jak zmienia się odpowiedź. To samo pytanie, inne ustawienia, inny wynik.",
-        secModel: "Model", secBench: "Warsztat", secExp: "Eksperymenty", secGloss: "Słownik parametrów",
+        lead: "Qwen3.5 0.8B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. To samo pytanie, dwa zestawy ustawień, dwie odpowiedzi obok siebie.",
+        navExp: "Eksperymenty", navSettings: "Ustawienia", navGloss: "Słownik",
         stateIdle: "nie załadowany", stateLoading: "pobieranie", stateCompiling: "kompilacja", stateReady: "gotowy", stateError: "błąd",
-        fParams: "Parametry", fDownload: "Pobieranie (raz)", fRuntime: "Silnik", fLangs: "Języki", fLangsV: "201, w tym polski",
-        load: "Załaduj model do przeglądarki", loadNote: "Pliki trafiają do pamięci podręcznej przeglądarki. Drugie uruchomienie jest szybkie.",
+        load: "Załaduj model", loadNote: "Pierwsze pobranie ok. 850 MB, potem z pamięci podręcznej.",
         noGpu: "Ta przeglądarka nie udostępnia WebGPU. Użyj aktualnego Chrome lub Edge na komputerze z kartą graficzną.",
-        whyTitle: "Co się dzieje", why1: "Wysłanych zapytań do serwera", why2: "Obliczeń na Twoim sprzęcie", why3: "Tokenów na sekundę (ostatnia odpowiedź)",
-        params: "Parametry", reset: "Domyślne",
-        gPrompt: "Prompt i kontekst", sysPrompt: "Prompt systemowy",
-        sysHint: "Instrukcja, którą model widzi przed Twoją wiadomością. Nadaje rolę, język i styl.",
-        memory: "Pamięć rozmowy", memoryHint: "Wyłączona: każda wiadomość to nowy start. Włączona: model widzi poprzednie tury, a prompt rośnie.",
-        thinking: "Tryb myślenia", thinkingHint: "Model najpierw pisze rozumowanie w bloku <think>, potem odpowiedź. Wolniej, ale często trafniej.",
-        on: "wł.", off: "wył.",
-        gSampling: "Losowość", decoding: "Dekodowanie", greedy: "deterministyczne", sampling: "losowe",
-        decodingHint: "Deterministyczne: zawsze najbardziej prawdopodobny token, ta sama odpowiedź za każdym razem (w dokumentacji: greedy, temperatura 0). Losowe: token wybierany z rozkładu.",
-        temperature: "Temperatura", tempHint: "Spłaszcza (wyżej) lub wyostrza (niżej) rozkład prawdopodobieństw. 0.1 niemal deterministycznie, 2.0 chaos.",
-        topkHint: "Losuj tylko spośród k najbardziej prawdopodobnych tokenów. 0 = bez ograniczenia, 1 = jak deterministyczne.",
-        toppHint: "Losuj spośród najmniejszego zbioru tokenów o łącznym prawdopodobieństwie p. 1.0 = wyłączone.",
-        gRepeat: "Powtórzenia", repPenalty: "Kara za powtórzenia", repHint: "Obniża prawdopodobieństwo tokenów, które już wystąpiły. 1.0 = brak kary, powyżej 1.3 model zaczyna unikać zwykłych słów.",
-        noRepeat: "Blokada n-gramów", noRepeatHint: "Zakazuje powtórzenia jakiejkolwiek sekwencji n tokenów. 0 = wyłączone. Przy 2 model nie powtórzy nawet nazwiska.",
-        gLength: "Długość", maxTokens: "Maks. tokenów", maxHint: "Twardy limit długości odpowiedzi. Model może skończyć wcześniej, jeśli sam wygeneruje znak końca.",
-        minTokens: "Min. tokenów", minHint: "Blokuje znak końca, aż powstanie tyle tokenów. Zmusza model do mówienia dalej.",
-        chat: "Czat", chatIdle: "czeka na model", chatReady: "gotowy", chatGen: "generuje", clear: "Wyczyść",
-        emptyChat: "Załaduj model, a potem wpisz wiadomość albo wybierz eksperyment poniżej.",
+        edit: "Zmień", emptyChat: "Załaduj model, wpisz wiadomość poniżej albo wybierz eksperyment z menu.",
+        emptyChatB: "Panel B dostaje tę samą wiadomość co A, ale z własnymi ustawieniami.",
+        composer: "Wiadomość", chatIdle: "czeka na model", chatReady: "gotowy", chatGen: "generuje",
+        compareOn: "Porównaj A/B", compareOff: "Tylko A", clear: "Wyczyść",
         attached: "Obraz dołączony do następnej wiadomości", remove: "Usuń",
         placeholder: "Napisz wiadomość…",
         shortcuts: "<span class='kbd'>Enter</span> wyślij · <span class='kbd'>Shift+Enter</span> nowa linia · <span class='kbd'>Esc</span> stop · <span class='kbd'>×3</span> ta sama wiadomość trzy razy",
@@ -600,39 +571,37 @@
         describeImage: "Opisz ten obraz.",
         thinkLabel: "rozumowanie", stopped: "przerwano",
         mTokens: "tok.", mTps: "tok./s", mTime: "s",
-        expLead: "Każda karta ustawia parametry i wpisuje pytanie. Kliknij „Ustaw”, a potem wyślij – najlepiej kilka razy, żeby zobaczyć rozrzut.",
-        apply: "Ustaw", applied: "Ustawiono – wyślij wiadomość",
-        glossTitle: "Co możesz kontrolować", thParam: "Parametr", thWhere: "Gdzie działa", thWhat: "Co robi", thTry: "Spróbuj",
+        editPanel: "Panel", compare: "Porównanie A/B", reset: "Domyślne",
+        gPrompt: "Prompt i kontekst", sysPrompt: "Prompt systemowy",
+        sysHint: "Instrukcja, którą model widzi przed Twoją wiadomością. Nadaje rolę, język i styl.",
+        memory: "Pamięć rozmowy", memoryHint: "Wyłączona: każda wiadomość to nowy start. Włączona: model widzi poprzednie tury.",
+        thinking: "Tryb myślenia", thinkingHint: "Model najpierw pisze rozumowanie, potem odpowiedź. Wolniej, ale często trafniej.",
+        on: "wł.", off: "wył.",
+        gSampling: "Losowość", decoding: "Dekodowanie", greedy: "deterministyczne", sampling: "losowe",
+        decodingHint: "Deterministyczne: zawsze najbardziej prawdopodobny token, ta sama odpowiedź za każdym razem (w dokumentacji: greedy, temperatura 0). Losowe: token wybierany z rozkładu.",
+        temperature: "Temperatura", tempHint: "Niska (0.1–0.5): przewidywalnie. Wysoka (1.5–2.0): zaskakująco, aż do chaosu.",
+        gLength: "Długość", maxTokens: "Maks. tokenów", maxHint: "Twardy limit długości odpowiedzi. Model może skończyć wcześniej.",
+        gVariant: "Wariant pytania", variant: "Pytanie dla tego panelu",
+        variantHint: "Puste: panel dostaje wiadomość z pola na dole. Wypełnione: panel dostaje ten tekst zamiast niej (np. to samo pytanie po angielsku).",
+        sumDet: "deterministyczne", sumRand: "losowe", sumT: "T", sumMem: "pamięć", sumThink: "myślenie", sumMax: "maks.",
+        expLead: "Każdy eksperyment włącza porównanie A/B, ustawia oba panele i wpisuje pytanie. Potem wyślij je – najlepiej kilka razy.",
+        apply: "Ustaw", panelA: "A", panelB: "B",
+        thParam: "Parametr", thWhat: "Co robi", thTry: "Spróbuj",
         footer: "edulab · materiał edukacyjny · model: Qwen3.5 0.8B (Apache 2.0), silnik: Transformers.js",
         errLoad: "Nie udało się załadować modelu: ",
         liveLoaded: "Model załadowany. Możesz pisać.", liveDone: "Odpowiedź gotowa.",
       },
       en: {
         title: "A small language model in your browser",
-        lead: "Qwen3.5 0.8B runs locally on your graphics card – no server, no API. Change the generation parameters and watch the answer change. Same question, different settings, different result.",
-        secModel: "Model", secBench: "Workbench", secExp: "Experiments", secGloss: "Parameter glossary",
+        lead: "Qwen3.5 0.8B runs locally on your graphics card – no server, no API. Same question, two sets of settings, two answers side by side.",
+        navExp: "Experiments", navSettings: "Settings", navGloss: "Glossary",
         stateIdle: "not loaded", stateLoading: "downloading", stateCompiling: "compiling", stateReady: "ready", stateError: "error",
-        fParams: "Parameters", fDownload: "Download (once)", fRuntime: "Runtime", fLangs: "Languages", fLangsV: "201, Polish included",
-        load: "Load the model into the browser", loadNote: "Files go to the browser cache. The second start is fast.",
+        load: "Load the model", loadNote: "First download about 850 MB, then from the browser cache.",
         noGpu: "This browser does not expose WebGPU. Use a current Chrome or Edge on a computer with a graphics card.",
-        whyTitle: "What is happening", why1: "Requests sent to a server", why2: "Compute on your own hardware", why3: "Tokens per second (last answer)",
-        params: "Parameters", reset: "Defaults",
-        gPrompt: "Prompt and context", sysPrompt: "System prompt",
-        sysHint: "The instruction the model sees before your message. It sets role, language and style.",
-        memory: "Conversation memory", memoryHint: "Off: every message is a fresh start. On: the model sees previous turns and the prompt grows.",
-        thinking: "Thinking mode", thinkingHint: "The model first writes its reasoning in a <think> block, then the answer. Slower, often more accurate.",
-        on: "on", off: "off",
-        gSampling: "Randomness", decoding: "Decoding", greedy: "greedy", sampling: "sampling",
-        decodingHint: "Greedy: always the most likely token, the same answer every time. Sampling: the token is drawn from the distribution.",
-        temperature: "Temperature", tempHint: "Flattens (higher) or sharpens (lower) the probability distribution. 0.1 is almost deterministic, 2.0 is chaos.",
-        topkHint: "Sample only among the k most likely tokens. 0 = no limit, 1 = same as greedy.",
-        toppHint: "Sample from the smallest set of tokens whose probabilities add up to p. 1.0 = off.",
-        gRepeat: "Repetition", repPenalty: "Repetition penalty", repHint: "Lowers the probability of tokens that already appeared. 1.0 = no penalty, above 1.3 the model starts avoiding ordinary words.",
-        noRepeat: "No-repeat n-gram", noRepeatHint: "Forbids repeating any sequence of n tokens. 0 = off. At 2 the model cannot even repeat a surname.",
-        gLength: "Length", maxTokens: "Max tokens", maxHint: "Hard limit on answer length. The model may stop earlier if it emits an end token itself.",
-        minTokens: "Min tokens", minHint: "Blocks the end token until this many tokens exist. Forces the model to keep talking.",
-        chat: "Chat", chatIdle: "waiting for model", chatReady: "ready", chatGen: "generating", clear: "Clear",
-        emptyChat: "Load the model, then type a message or pick an experiment below.",
+        edit: "Change", emptyChat: "Load the model, type a message below or pick an experiment from the menu.",
+        emptyChatB: "Panel B gets the same message as A, with its own settings.",
+        composer: "Message", chatIdle: "waiting for model", chatReady: "ready", chatGen: "generating",
+        compareOn: "Compare A/B", compareOff: "Only A", clear: "Clear",
         attached: "Image attached to the next message", remove: "Remove",
         placeholder: "Type a message…",
         shortcuts: "<span class='kbd'>Enter</span> send · <span class='kbd'>Shift+Enter</span> new line · <span class='kbd'>Esc</span> stop · <span class='kbd'>×3</span> same message three times",
@@ -640,115 +609,110 @@
         describeImage: "Describe this image.",
         thinkLabel: "reasoning", stopped: "stopped",
         mTokens: "tok", mTps: "tok/s", mTime: "s",
-        expLead: "Each card sets the parameters and fills in a question. Click “Set”, then send – ideally several times, to see the spread.",
-        apply: "Set", applied: "Set – now send the message",
-        glossTitle: "What you can control", thParam: "Parameter", thWhere: "Where it acts", thWhat: "What it does", thTry: "Try",
+        editPanel: "Panel", compare: "A/B comparison", reset: "Defaults",
+        gPrompt: "Prompt and context", sysPrompt: "System prompt",
+        sysHint: "The instruction the model sees before your message. It sets role, language and style.",
+        memory: "Conversation memory", memoryHint: "Off: every message is a fresh start. On: the model sees previous turns.",
+        thinking: "Thinking mode", thinkingHint: "The model writes its reasoning first, then the answer. Slower, often more accurate.",
+        on: "on", off: "off",
+        gSampling: "Randomness", decoding: "Decoding", greedy: "deterministic", sampling: "random",
+        decodingHint: "Deterministic: always the most likely token, the same answer every time (in docs: greedy, temperature 0). Random: the token is drawn from the distribution.",
+        temperature: "Temperature", tempHint: "Low (0.1–0.5): predictable. High (1.5–2.0): surprising, up to chaos.",
+        gLength: "Length", maxTokens: "Max tokens", maxHint: "Hard limit on answer length. The model may stop earlier.",
+        gVariant: "Question variant", variant: "Question for this panel",
+        variantHint: "Empty: the panel gets the message from the box below. Filled: the panel gets this text instead (e.g. the same question in English).",
+        sumDet: "deterministic", sumRand: "random", sumT: "T", sumMem: "memory", sumThink: "thinking", sumMax: "max",
+        expLead: "Each experiment turns on the A/B comparison, sets both panels and fills in a question. Then send it – ideally several times.",
+        apply: "Set", panelA: "A", panelB: "B",
+        thParam: "Parameter", thWhat: "What it does", thTry: "Try",
         footer: "edulab · educational material · model: Qwen3.5 0.8B (Apache 2.0), runtime: Transformers.js",
         errLoad: "Could not load the model: ",
         liveLoaded: "Model loaded. You can type.", liveDone: "Answer ready.",
       },
     };
 
-    // Experiments: each sets parameters + a prompt. Texts per language.
     const EXPERIMENTS = [
       { id: "temp", tone: "yellow", icon: "thermometer",
-        set: { sample: 1, temp: 1.8, topk: 0, topp: 1, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
-        pl: { title: "Temperatura 1.8", body: "Bez top-k i top-p model losuje z całego rozkładu. Wyślij trzy razy (×3) i porównaj. Potem ustaw 0.3 i wyślij znów.", prompt: "Dokończ zdanie jednym krótkim zdaniem: Kot wszedł do kuchni i" },
-        en: { title: "Temperature 1.8", body: "Without top-k and top-p the model samples from the whole distribution. Send three times (×3) and compare. Then set 0.3 and send again.", prompt: "Finish with one short sentence: The cat walked into the kitchen and" } },
-      { id: "greedy", tone: "ink", icon: "hash",
-        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
-        pl: { title: "Dekodowanie deterministyczne", body: "Zero losowości. Wyślij to samo pytanie trzy razy: odpowiedzi będą identyczne. To jest „temperatura 0” w API.", prompt: "Podaj trzy nazwy owoców." },
-        en: { title: "Greedy decoding", body: "No randomness. Send the same question three times: the answers will be identical. This is “temperature 0” in an API.", prompt: "Name three fruits." } },
-      { id: "topk1", tone: "blue", icon: "list-filter",
-        set: { sample: 1, temp: 2, topk: 1, topp: 1, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
-        pl: { title: "Top-k = 1 przy temperaturze 2", body: "Temperatura jest wysoka, ale top-k zostawia tylko jeden kandydat. Wynik: brak losowości. Pokazuje, że top-k działa po temperaturze.", prompt: "Jaka jest stolica Francji?" },
-        en: { title: "Top-k = 1 at temperature 2", body: "Temperature is high, but top-k leaves a single candidate. Result: no randomness. It shows that top-k acts after temperature.", prompt: "What is the capital of France?" } },
+        a: { sample: 1, temp: 0.3 }, b: { sample: 1, temp: 1.8 },
+        pl: { title: "Temperatura 0.3 kontra 1.8", body: "To samo pytanie: A odpowiada ostrożnie, B szaleje. Wyślij ×3, żeby zobaczyć, jak bardzo B zmienia się między próbami.", prompt: "Dokończ jednym zdaniem: Kot wszedł do kuchni i" },
+        en: { title: "Temperature 0.3 versus 1.8", body: "Same question: A answers cautiously, B goes wild. Send ×3 to see how much B changes between tries.", prompt: "Finish with one sentence: The cat walked into the kitchen and" } },
+      { id: "det", tone: "ink", icon: "hash",
+        a: { sample: 0 }, b: { sample: 1, temp: 1.0 },
+        pl: { title: "Deterministyczne kontra losowe", body: "Wyślij ×3. W A trzy identyczne odpowiedzi, w B trzy różne. Tryb deterministyczny to „temperatura 0” w API.", prompt: "Podaj trzy nazwy owoców." },
+        en: { title: "Deterministic versus random", body: "Send ×3. Panel A gives three identical answers, panel B three different ones. Deterministic is “temperature 0” in an API.", prompt: "Name three fruits." } },
       { id: "persona", tone: "grape", icon: "message-square",
-        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 160, thinking: 0, memory: 0,
-          sys: { pl: "Jesteś piratem z XVII wieku. Odpowiadasz wyłącznie po polsku, w stylu pirackim, maksymalnie dwa zdania.", en: "You are a 17th-century pirate. Answer only in pirate style, two sentences at most." } },
-        pl: { title: "Prompt systemowy", body: "Ta sama wiadomość, inna instrukcja systemowa. Zmień rolę w polu „Prompt systemowy” i wyślij ponownie.", prompt: "Jak działa fotosynteza?" },
-        en: { title: "System prompt", body: "Same message, different system instruction. Change the role in the “System prompt” field and send again.", prompt: "How does photosynthesis work?" } },
+        a: { sample: 0 }, b: { sample: 0, sys: { pl: "Jesteś piratem z XVII wieku. Odpowiadasz po polsku, w stylu pirackim, maksymalnie dwa zdania.", en: "You are a 17th-century pirate. Answer in pirate style, two sentences at most." } },
+        pl: { title: "Prompt systemowy", body: "Ta sama wiadomość, inna instrukcja systemowa: A to zwykły asystent, B to pirat. Zmień rolę w ustawieniach panelu B i wyślij ponownie.", prompt: "Jak działa fotosynteza?" },
+        en: { title: "System prompt", body: "Same message, different system instruction: A is a plain assistant, B is a pirate. Change B's role in its settings and send again.", prompt: "How does photosynthesis work?" } },
       { id: "lang", tone: "green", icon: "languages",
-        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 160, thinking: 0, memory: 0,
-          sys: { pl: "You are a helpful assistant. Answer in the language of the question.", en: "You are a helpful assistant. Answer in the language of the question." } },
-        pl: { title: "Polski kontra angielski", body: "Mały model ma mniej danych po polsku. Prompt systemowy jest po angielsku, żeby nie narzucać języka. Wyślij po polsku, potem to samo po angielsku i porównaj.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." },
-        en: { title: "Polish versus English", body: "A small model has seen less Polish data. The system prompt is in English so it does not force a language. Send in Polish, then the same in English, and compare.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." } },
-      { id: "repeat", tone: "red", icon: "repeat",
-        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1.8, ngram: 2, maxTok: 160, thinking: 0, memory: 0 },
-        pl: { title: "Przesadna kara za powtórzenia", body: "Kara 1.8 i blokada 2-gramów. Model nie może powtórzyć nawet „i”. Zobacz, jak zaczyna kaleczyć język. Potem wróć do 1.0 i 0.", prompt: "Wymień dni tygodnia." },
-        en: { title: "Excessive repetition penalty", body: "Penalty 1.8 and a 2-gram block. The model cannot even repeat “the”. Watch the language break. Then go back to 1.0 and 0.", prompt: "List the days of the week." } },
+        a: { sample: 0, sys: "You are a helpful assistant. Answer in the language of the question." },
+        b: { sample: 0, sys: "You are a helpful assistant. Answer in the language of the question.", variant: "Explain in two sentences what inflation is." },
+        pl: { title: "Polski kontra angielski", body: "A dostaje pytanie po polsku, B to samo pytanie po angielsku. Mały model ma mniej danych po polsku – porównaj gramatykę i treść.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." },
+        en: { title: "Polish versus English", body: "A gets the question in Polish, B the same question in English. A small model has seen less Polish – compare grammar and content.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." } },
       { id: "think", tone: "blue", icon: "brain",
-        set: { sample: 1, temp: 0.6, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 1200, thinking: 1, memory: 0 },
-        pl: { title: "Tryb myślenia", body: "Model najpierw rozumuje w bloku <think>, potem odpowiada. Rozumowanie bywa długie: jeśli zużyje cały limit tokenów, zwiększ go. Porównaj z trybem wyłączonym.", prompt: "Mam 3 jabłka, zjadłem jedno i kupiłem 5 gruszek. Ile mam owoców?" },
-        en: { title: "Thinking mode", body: "The model reasons in a <think> block first, then answers. Reasoning can be long: if it eats the whole token budget, raise it. Compare with thinking off.", prompt: "I had 3 apples, ate one and bought 5 pears. How many pieces of fruit do I have?" } },
+        a: { sample: 1, temp: 0.6, thinking: 0, maxTok: 300 }, b: { sample: 1, temp: 0.6, thinking: 1, maxTok: 1200 },
+        pl: { title: "Myślenie wyłączone kontra włączone", body: "A odpowiada od razu, B najpierw rozumuje. Rozumowanie bywa długie: jeśli B zużyje cały limit tokenów, zwiększ go w ustawieniach.", prompt: "Mam 3 jabłka, zjadłem jedno i kupiłem 5 gruszek. Ile mam owoców?" },
+        en: { title: "Thinking off versus on", body: "A answers right away, B reasons first. Reasoning can be long: if B eats the whole token budget, raise it in settings.", prompt: "I had 3 apples, ate one and bought 5 pears. How many pieces of fruit do I have?" } },
       { id: "memory", tone: "grape", icon: "timer",
-        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 1 },
-        pl: { title: "Pamięć rozmowy", body: "Pamięć włączona. Wyślij tę wiadomość, potem zapytaj „Jak się nazywam?”. Następnie wyłącz pamięć i zadaj to pytanie jeszcze raz.", prompt: "Nazywam się Ania i mieszkam w Gdańsku." },
-        en: { title: "Conversation memory", body: "Memory on. Send this, then ask “What is my name?”. Then switch memory off and ask the same question again.", prompt: "My name is Anna and I live in Gdańsk." } },
-      { id: "min", tone: "yellow", icon: "ruler",
-        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 200, minTok: 120, thinking: 0, memory: 0 },
-        pl: { title: "Min. 120 tokenów", body: "Pytanie ma odpowiedź jednym słowem, ale model nie może skończyć przed 120 tokenami. Zobacz, co dopisze.", prompt: "Odpowiedz jednym słowem: jaki kolor ma niebo?" },
-        en: { title: "Min 120 tokens", body: "The question has a one-word answer, but the model may not stop before 120 tokens. See what it adds.", prompt: "Answer with one word: what colour is the sky?" } },
+        a: { sample: 0, memory: 1 }, b: { sample: 0, memory: 0 },
+        pl: { title: "Pamięć rozmowy", body: "A pamięta rozmowę, B nie. Wyślij tę wiadomość, a potem zapytaj „Jak mam na imię?”.", prompt: "Mam na imię Ania i mieszkam w Gdańsku." },
+        en: { title: "Conversation memory", body: "A remembers the conversation, B does not. Send this message, then ask “What is my name?”.", prompt: "My name is Anna and I live in Gdańsk." } },
+      { id: "length", tone: "red", icon: "ruler",
+        a: { sample: 0, maxTok: 25 }, b: { sample: 0, maxTok: 250 },
+        pl: { title: "Limit 25 kontra 250 tokenów", body: "Ta sama odpowiedź ucięta w połowie zdania w A i dokończona w B. Limit tokenów to nożyczki, nie prośba o zwięzłość.", prompt: "Opisz Warszawę." },
+        en: { title: "Limit 25 versus 250 tokens", body: "The same answer cut mid-sentence in A and completed in B. The token limit is scissors, not a request for brevity.", prompt: "Describe Warsaw." } },
     ];
 
     const GLOSSARY = {
       pl: [
-        ["Prompt systemowy", "wejście", "Instrukcja przed rozmową: rola, język, styl, ograniczenia.", "Każ odpowiadać wyłącznie po angielsku i wyślij pytanie po polsku."],
-        ["Pamięć rozmowy", "wejście", "Czy poprzednie tury trafiają do promptu. Dłuższy prompt = wolniej.", "Przedstaw się, potem zapytaj o swoje imię z pamięcią i bez."],
-        ["Tryb myślenia", "szablon", "Flaga enable_thinking w szablonie czatu: model pisze rozumowanie przed odpowiedzią.", "Zadanie arytmetyczne z myśleniem i bez."],
-        ["Dekodowanie", "wybór tokena", "Deterministyczne (greedy) = argmax. Losowe = próbkowanie z rozkładu po temperaturze, top-k i top-p.", "To samo pytanie ×3 w obu trybach."],
-        ["Temperatura", "logity", "Dzieli logity przez T przed softmaxem. Wysoka spłaszcza, niska wyostrza.", "0.3 kontra 1.8 na kreatywnym zadaniu."],
-        ["Top-k", "filtr", "Zostawia k najbardziej prawdopodobnych tokenów, resztę zeruje.", "k = 1 przy wysokiej temperaturze."],
-        ["Top-p (nucleus)", "filtr", "Zostawia najmniejszy zbiór o łącznym prawdopodobieństwie p.", "0.5 kontra 1.0 na tym samym pytaniu."],
-        ["Kara za powtórzenia", "logity", "Mnoży logity już użytych tokenów (dzieli, gdy dodatnie), by zniechęcić do powtórek.", "1.0 kontra 1.8 przy wyliczance."],
-        ["Blokada n-gramów", "filtr", "Zeruje tokeny, które utworzyłyby powtórzony n-gram.", "n = 2 i poproś o listę z powtarzającym się słowem."],
-        ["Maks. tokenów", "stop", "Twardy limit długości.", "20 tokenów i poproś o esej."],
-        ["Min. tokenów", "stop", "Blokuje token końca do osiągnięcia limitu.", "120 tokenów i pytanie na jedno słowo."],
-        ["Obraz", "wejście", "Model jest wielomodalny: obraz zamienia się na tokeny wizyjne (448×448).", "Dołącz zdjęcie i poproś o opis po polsku."],
-        ["Ziarno losowości (seed)", "–", "Niedostępne w tej bibliotece: losowanie korzysta z Math.random, więc wyników z losowaniem nie da się odtworzyć.", "Użyj dekodowania deterministycznego, gdy potrzebujesz powtarzalności."],
+        ["Prompt systemowy", "Instrukcja przed rozmową: rola, język, styl, ograniczenia.", "Każ odpowiadać wyłącznie po angielsku i wyślij pytanie po polsku."],
+        ["Pamięć rozmowy", "Czy poprzednie tury trafiają do promptu. Dłuższy prompt = wolniej.", "Przedstaw się, potem zapytaj o swoje imię z pamięcią i bez."],
+        ["Tryb myślenia", "Model pisze rozumowanie przed odpowiedzią (blok <think>).", "Zadanie arytmetyczne z myśleniem i bez."],
+        ["Dekodowanie", "Deterministyczne (greedy) = zawsze najbardziej prawdopodobny token. Losowe = próbkowanie z rozkładu.", "To samo pytanie ×3 w obu trybach."],
+        ["Temperatura", "Spłaszcza (wysoka) lub wyostrza (niska) rozkład prawdopodobieństw przed losowaniem.", "0.3 kontra 1.8 na kreatywnym zadaniu."],
+        ["Maks. tokenów", "Twardy limit długości odpowiedzi.", "25 tokenów i poproś o opis miasta."],
+        ["Obraz", "Model jest wielomodalny: obraz zamienia się na tokeny wizyjne (448×448).", "Dołącz zdjęcie i poproś o opis po polsku."],
+        ["Ziarno losowości (seed)", "Niedostępne w tej bibliotece: losowanie korzysta z Math.random, więc wyników z losowaniem nie da się odtworzyć.", "Użyj dekodowania deterministycznego, gdy potrzebujesz powtarzalności."],
       ],
       en: [
-        ["System prompt", "input", "Instruction before the conversation: role, language, style, limits.", "Order English-only answers and send a Polish question."],
-        ["Conversation memory", "input", "Whether previous turns go into the prompt. Longer prompt = slower.", "Introduce yourself, then ask for your name with and without memory."],
-        ["Thinking mode", "template", "The enable_thinking flag in the chat template: the model writes reasoning before the answer.", "An arithmetic task with and without thinking."],
-        ["Decoding", "token choice", "Greedy = argmax. Sampling = draw from the distribution after temperature, top-k and top-p.", "Same question ×3 in both modes."],
-        ["Temperature", "logits", "Divides logits by T before softmax. High flattens, low sharpens.", "0.3 versus 1.8 on a creative task."],
-        ["Top-k", "filter", "Keeps the k most likely tokens, zeroes the rest.", "k = 1 at a high temperature."],
-        ["Top-p (nucleus)", "filter", "Keeps the smallest set whose probabilities add up to p.", "0.5 versus 1.0 on the same question."],
-        ["Repetition penalty", "logits", "Scales logits of tokens already used to discourage repeats.", "1.0 versus 1.8 on a list."],
-        ["No-repeat n-gram", "filter", "Zeroes tokens that would complete a repeated n-gram.", "n = 2 and ask for a list with a recurring word."],
-        ["Max tokens", "stop", "Hard length limit.", "20 tokens and ask for an essay."],
-        ["Min tokens", "stop", "Blocks the end token until the limit is reached.", "120 tokens and a one-word question."],
-        ["Image", "input", "The model is multimodal: an image becomes vision tokens (448×448).", "Attach a photo and ask for a description in Polish."],
-        ["Random seed", "–", "Not available in this library: sampling uses Math.random, so sampled results cannot be reproduced.", "Use greedy decoding when you need repeatability."],
+        ["System prompt", "Instruction before the conversation: role, language, style, limits.", "Order English-only answers and send a Polish question."],
+        ["Conversation memory", "Whether previous turns go into the prompt. Longer prompt = slower.", "Introduce yourself, then ask for your name with and without memory."],
+        ["Thinking mode", "The model writes reasoning before the answer (a <think> block).", "An arithmetic task with and without thinking."],
+        ["Decoding", "Deterministic (greedy) = always the most likely token. Random = sampling from the distribution.", "Same question ×3 in both modes."],
+        ["Temperature", "Flattens (high) or sharpens (low) the probability distribution before sampling.", "0.3 versus 1.8 on a creative task."],
+        ["Max tokens", "Hard limit on answer length.", "25 tokens and ask for a city description."],
+        ["Image", "The model is multimodal: an image becomes vision tokens (448×448).", "Attach a photo and ask for a description in Polish."],
+        ["Random seed", "Not available in this library: sampling uses Math.random, so random results cannot be reproduced.", "Use deterministic decoding when you need repeatability."],
       ],
     };
 
     // ─── State ───
     const S = {
       lang: "pl",
-      status: "idle",          // idle | loading | ready | generating
+      status: "idle",            // idle | loading | compiling | ready | generating | error
+      compare: 0,
+      editing: "a",
       processor: null, model: null,
-      history: [],             // chat turns when memory is on
-      attached: null,          // { raw, dataURL }
-      stopper: null,
-      params: { ...DEFAULTS, sys: DEFAULTS.sys.pl },
-      progress: {},            // file -> { loaded, total }
+      panels: { a: { ...PANEL_DEFAULT, history: [] }, b: { ...PANEL_DEFAULT, history: [] } },
+      attached: null,
+      stopper: null, abortRun: false,
+      progress: {},
     };
 
     // ─── DOM refs ───
     const $ = (id) => document.getElementById(id);
     const el = {
       body: document.body, live: $("live"),
-      modelChip: $("modelChip"), btnLoad: $("btnLoad"), progressWrap: $("progressWrap"), progressBar: $("progressBar"),
-      progressFile: $("progressFile"), progressPct: $("progressPct"), gpuWarn: $("gpuWarn"), loadError: $("loadError"), loadErrorText: $("loadErrorText"),
-      statTps: $("statTps"),
-      sysInput: $("sysInput"), tempInput: $("tempInput"), topkInput: $("topkInput"), toppInput: $("toppInput"), repInput: $("repInput"), ngramInput: $("ngramInput"),
-      maxTok: $("maxTok"), minTok: $("minTok"), btnReset: $("btnReset"),
-      chatState: $("chatState"), messages: $("messages"), emptyMsg: $("emptyMsg"), msgInput: $("msgInput"),
-      btnSend: $("btnSend"), btnStop: $("btnStop"), btnRepeat: $("btnRepeat"), btnClear: $("btnClear"), btnAttach: $("btnAttach"), btnDetach: $("btnDetach"),
-      fileInput: $("fileInput"), attachPreview: $("attachPreview"), attachImg: $("attachImg"),
+      modelChip: $("modelChip"), modelBody: $("modelBody"), modelNote: $("modelNote"), btnLoad: $("btnLoad"),
+      progressWrap: $("progressWrap"), progressBar: $("progressBar"), progressFile: $("progressFile"), progressPct: $("progressPct"),
+      gpuWarn: $("gpuWarn"), loadError: $("loadError"), loadErrorText: $("loadErrorText"),
+      panels: { a: document.querySelector('[data-panel="a"]'), b: document.querySelector('[data-panel="b"]') },
+      chatState: $("chatState"), msgInput: $("msgInput"),
+      btnSend: $("btnSend"), btnStop: $("btnStop"), btnRepeat: $("btnRepeat"), btnClear: $("btnClear"), btnCompare: $("btnCompare"),
+      btnAttach: $("btnAttach"), btnDetach: $("btnDetach"), fileInput: $("fileInput"), attachPreview: $("attachPreview"), attachImg: $("attachImg"),
+      dlgExp: $("dlgExp"), dlgSettings: $("dlgSettings"), dlgGloss: $("dlgGloss"),
       tiles: $("tiles"), glossBody: $("glossBody"),
+      sysInput: $("sysInput"), tempInput: $("tempInput"), maxTok: $("maxTok"), variantInput: $("variantInput"), variantGroup: $("variantGroup"), btnReset: $("btnReset"), panelPick: $("panelPick"),
     };
 
     // ─── Helpers ───
@@ -756,7 +720,10 @@
     const fmtMB = (b) => (b / 1e6).toFixed(0) + " MB";
     const announce = (text) => { el.live.textContent = ""; setTimeout(() => { el.live.textContent = text; }, 30); };
     const icons = () => { if (window.lucide) lucide.createIcons(); };
-    const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const activePanels = () => (S.compare ? ["a", "b"] : ["a"]);
+    const sysOf = (p) => (p.sys && p.sys.trim()) ? p.sys.trim() : SYS_DEFAULT[S.lang];
+    const localized = (v) => (v && typeof v === "object") ? v[S.lang] : v;
 
     function setStatus(status) {
       S.status = status;
@@ -764,11 +731,12 @@
       const chipKey = { idle: "stateIdle", loading: "stateLoading", compiling: "stateCompiling", ready: "stateReady", generating: "stateReady", error: "stateError" }[status];
       el.modelChip.textContent = t(chipKey);
       el.modelChip.className = "edu-chip " + ({ ready: "tone-green", generating: "tone-green", error: "tone-red", idle: "tone-stone" }[status] || "tone-yellow");
-      const chatKey = status === "generating" ? "chatGen" : (status === "ready" ? "chatReady" : "chatIdle");
-      el.chatState.textContent = t(chatKey);
-      el.chatState.className = "edu-chip " + (status === "generating" ? "tone-yellow" : status === "ready" ? "tone-green" : "tone-stone");
       const ready = status === "ready";
-      el.btnLoad.disabled = status === "loading" || status === "compiling" || ready || status === "generating";
+      el.chatState.textContent = t(status === "generating" ? "chatGen" : ready ? "chatReady" : "chatIdle");
+      el.chatState.className = "edu-chip " + (status === "generating" ? "tone-yellow" : ready ? "tone-green" : "tone-stone");
+      el.btnLoad.hidden = ready || status === "generating";
+      el.modelNote.hidden = ready || status === "generating";
+      el.btnLoad.disabled = status === "loading" || status === "compiling";
       el.btnSend.hidden = status === "generating";
       el.btnStop.hidden = status !== "generating";
       el.btnRepeat.disabled = !ready;
@@ -782,55 +750,23 @@
       el.btnSend.disabled = !(S.status === "ready" && (hasText || S.attached));
     }
 
-    function readParams() {
-      const p = S.params;
-      p.sys = el.sysInput.value;
-      p.temp = parseFloat(el.tempInput.value);
-      p.topk = parseInt(el.topkInput.value, 10);
-      p.topp = parseFloat(el.toppInput.value);
-      p.rep = parseFloat(el.repInput.value);
-      p.ngram = parseInt(el.ngramInput.value, 10);
-      p.maxTok = Math.max(1, parseInt(el.maxTok.value, 10) || 1);
-      p.minTok = Math.max(0, parseInt(el.minTok.value, 10) || 0);
-      return p;
-    }
-
-    function writeParams() {
-      const p = S.params;
-      el.sysInput.value = p.sys;
-      el.tempInput.value = p.temp; el.topkInput.value = p.topk; el.toppInput.value = p.topp;
-      el.repInput.value = p.rep; el.ngramInput.value = p.ngram; el.maxTok.value = p.maxTok; el.minTok.value = p.minTok;
-      for (const name of ["memory", "thinking", "sample"]) {
-        document.querySelectorAll(`[data-sw="${name}"]`).forEach((b) => b.classList.toggle("active", Number(b.dataset.val) === Number(p[name])));
-      }
-      renderParamValues();
-      el.body.dataset.params = JSON.stringify({ sample: p.sample, temp: p.temp, topk: p.topk, topp: p.topp, rep: p.rep, ngram: p.ngram, maxTok: p.maxTok, minTok: p.minTok, thinking: p.thinking, memory: p.memory });
-    }
-
-    function renderParamValues() {
-      $("tempVal").textContent = parseFloat(el.tempInput.value).toFixed(1);
-      $("topkVal").textContent = el.topkInput.value === "0" ? "off" : el.topkInput.value;
-      $("toppVal").textContent = el.toppInput.value === "1" ? "off" : parseFloat(el.toppInput.value).toFixed(2);
-      $("repVal").textContent = parseFloat(el.repInput.value).toFixed(2);
-      $("ngramVal").textContent = el.ngramInput.value === "0" ? "off" : el.ngramInput.value;
-      const sampling = Number(S.params.sample) === 1;
-      document.querySelectorAll("[data-needs-sample]").forEach((f) => {
-        f.classList.toggle("disabled-note", !sampling);
-        f.querySelectorAll("input").forEach((i) => { i.disabled = !sampling; });
-      });
+    function setCompare(on) {
+      S.compare = on ? 1 : 0;
+      el.body.dataset.compare = S.compare;
+      el.panels.b.hidden = !S.compare;
+      el.btnCompare.querySelector("span").textContent = t(S.compare ? "compareOff" : "compareOn");
+      document.querySelectorAll("[data-sw-compare]").forEach((b) => b.classList.toggle("active", Number(b.dataset.swCompare) === S.compare));
+      el.panelPick.hidden = !S.compare;
+      el.variantGroup.hidden = !S.compare;
+      if (!S.compare && S.editing === "b") { S.editing = "a"; }
+      writeSettings();
+      renderSummaries();
     }
 
     function buildGenerationOptions(p) {
       const sampling = Number(p.sample) === 1;
       const opts = { max_new_tokens: p.maxTok, do_sample: sampling };
-      if (p.minTok > 0) opts.min_new_tokens = p.minTok;
-      if (sampling) {
-        opts.temperature = p.temp;
-        opts.top_k = p.topk > 0 ? p.topk : 0;
-        if (p.topp < 1) opts.top_p = p.topp;
-      }
-      if (p.rep !== 1) opts.repetition_penalty = p.rep;
-      if (p.ngram > 0) opts.no_repeat_ngram_size = p.ngram;
+      if (sampling) opts.temperature = p.temp;
       return opts;
     }
 
@@ -838,25 +774,6 @@
       const idx = text.indexOf("</think>");
       if (idx === -1) return { think: text, answer: "", open: true };
       return { think: text.slice(0, idx).replace(/^<think>\s*/, "").trim(), answer: text.slice(idx + 8).replace(/^\s+/, ""), open: false };
-    }
-
-    function renderAssistant(node, fullText, thinking, done) {
-      const body = node.querySelector(".body");
-      const thinkEl = node.querySelector(".think");
-      if (thinking) {
-        const { think, answer, open } = splitThinking(fullText);
-        thinkEl.hidden = false;
-        thinkEl.querySelector(".think-body").textContent = think;
-        if (open && !done) thinkEl.open = true;
-        if (!open) thinkEl.open = false;
-        body.textContent = answer;
-        body.classList.toggle("cursor", !done);
-      } else {
-        thinkEl.hidden = true;
-        body.textContent = fullText;
-        body.classList.toggle("cursor", !done);
-      }
-      el.messages.scrollTop = el.messages.scrollHeight;
     }
 
     // ─── Render ───
@@ -868,32 +785,72 @@
       document.querySelectorAll("[data-i18n-html]").forEach((n) => { n.innerHTML = t(n.dataset.i18nHtml); });
       document.querySelectorAll("[data-i18n-placeholder]").forEach((n) => { n.placeholder = t(n.dataset.i18nPlaceholder); });
       document.querySelectorAll("[data-lang-btn]").forEach((b) => b.classList.toggle("active", b.dataset.langBtn === S.lang));
-      // Default system prompt follows the language until the user edits it.
-      const otherLang = S.lang === "pl" ? "en" : "pl";
-      if (S.params.sys === DEFAULTS.sys[otherLang] || S.params.sys === "") { S.params.sys = DEFAULTS.sys[S.lang]; el.sysInput.value = S.params.sys; }
       setStatus(S.status);
+      setCompare(S.compare);
       renderTiles();
       renderGlossary();
       icons();
     }
 
+    function summaryOf(p) {
+      const parts = [];
+      parts.push(Number(p.sample) ? `<b>${t("sumRand")}</b> · ${t("sumT")} <b>${Number(p.temp).toFixed(1)}</b>` : `<b>${t("sumDet")}</b>`);
+      parts.push(`${t("sumMax")} <b>${p.maxTok}</b>`);
+      if (Number(p.memory)) parts.push(`<b>${t("sumMem")}</b>`);
+      if (Number(p.thinking)) parts.push(`<b>${t("sumThink")}</b>`);
+      return parts.join(" · ");
+    }
+
+    function renderSummaries() {
+      for (const id of ["a", "b"]) {
+        const p = S.panels[id]; const node = el.panels[id];
+        node.querySelector("[data-sum]").innerHTML = summaryOf(p);
+        node.querySelector("[data-sys]").textContent = sysOf(p);
+        const v = node.querySelector("[data-variant]");
+        v.hidden = !(p.variant && p.variant.trim());
+        v.innerHTML = `<span class="lbl">${t("variant")}</span>${escapeHtml(p.variant || "")}`;
+        node.dataset.params = JSON.stringify({ sample: p.sample, temp: p.temp, maxTok: p.maxTok, memory: p.memory, thinking: p.thinking, sys: sysOf(p), variant: p.variant || "" });
+      }
+      el.body.dataset.params = JSON.stringify({ compare: S.compare, a: JSON.parse(el.panels.a.dataset.params), b: JSON.parse(el.panels.b.dataset.params) });
+    }
+
+    function writeSettings() {
+      const p = S.panels[S.editing];
+      document.querySelectorAll("[data-pick]").forEach((b) => b.classList.toggle("active", b.dataset.pick === S.editing));
+      el.sysInput.value = p.sys; el.sysInput.placeholder = SYS_DEFAULT[S.lang];
+      el.tempInput.value = p.temp; el.maxTok.value = p.maxTok; el.variantInput.value = p.variant || "";
+      for (const name of ["memory", "thinking", "sample"]) {
+        document.querySelectorAll(`[data-sw="${name}"]`).forEach((b) => b.classList.toggle("active", Number(b.dataset.val) === Number(p[name])));
+      }
+      $("tempVal").textContent = Number(p.temp).toFixed(1);
+      const sampling = Number(p.sample) === 1;
+      document.querySelectorAll("[data-needs-sample]").forEach((f) => { f.classList.toggle("disabled-note", !sampling); f.querySelectorAll("input").forEach((i) => { i.disabled = !sampling; }); });
+    }
+
+    function readSettings() {
+      const p = S.panels[S.editing];
+      p.sys = el.sysInput.value;
+      p.temp = parseFloat(el.tempInput.value);
+      p.maxTok = Math.max(1, parseInt(el.maxTok.value, 10) || 1);
+      p.variant = el.variantInput.value;
+      $("tempVal").textContent = p.temp.toFixed(1);
+      renderSummaries();
+    }
+
     function renderTiles() {
       el.tiles.innerHTML = EXPERIMENTS.map((x) => {
         const c = x[S.lang];
-        const chips = Object.entries(x.set).filter(([k]) => !["sys"].includes(k)).map(([k, v]) => {
-          const label = { sample: v ? "sampling" : "greedy", temp: `T ${v}`, topk: `top-k ${v || "off"}`, topp: `top-p ${v === 1 ? "off" : v}`, rep: `rep ${v}`, ngram: `n-gram ${v || "off"}`, maxTok: `max ${v}`, minTok: `min ${v}`, thinking: v ? "think" : null, memory: v ? "memory" : null }[k];
-          return label ? `<span class="edu-chip">${label}</span>` : "";
-        }).join("");
+        const desc = (side) => summaryOf({ ...PANEL_DEFAULT, ...side }).replace(/<\/?b>/g, "");
         return `<article class="card" data-exp="${x.id}">
           <div class="card-head"><span class="tile-h"><span class="badge tone-${x.tone}"><i data-lucide="${x.icon}" class="ic" aria-hidden="true"></i></span><h3>${escapeHtml(c.title)}</h3></span></div>
-          <div class="card-body"><p>${escapeHtml(c.body)}</p><div class="settings">${chips}</div></div>
-          <div class="card-foot"><button class="edu-btn btn-sm" type="button" data-apply="${x.id}"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i><span>${t("apply")}</span></button><span class="edu-caption" data-applied hidden>${t("applied")}</span></div>
+          <div class="card-body"><p>${escapeHtml(c.body)}</p><p class="ab"><b>A</b> ${desc(x.a)}<br><b>B</b> ${desc(x.b)}</p></div>
+          <div class="card-foot"><button class="edu-btn btn-sm" type="button" data-apply="${x.id}"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i><span>${t("apply")}</span></button></div>
         </article>`;
       }).join("");
     }
 
     function renderGlossary() {
-      el.glossBody.innerHTML = GLOSSARY[S.lang].map((r) => `<tr><td>${escapeHtml(r[0])}</td><td class="mono">${escapeHtml(r[1])}</td><td>${escapeHtml(r[2])}</td><td>${escapeHtml(r[3])}</td></tr>`).join("");
+      el.glossBody.innerHTML = GLOSSARY[S.lang].map((r) => `<tr><td>${escapeHtml(r[0])}</td><td>${escapeHtml(r[1])}</td><td>${escapeHtml(r[2])}</td></tr>`).join("");
     }
 
     function renderProgress() {
@@ -908,49 +865,65 @@
       el.body.dataset.progress = pct;
     }
 
-    function addUserMessage(text, image) {
-      el.emptyMsg.hidden = true;
+    function messagesOf(id) { return el.panels[id].querySelector("[data-messages]"); }
+
+    function addUserMessage(id, text, image) {
+      const box = messagesOf(id);
+      box.querySelector("[data-empty]").hidden = true;
       const node = document.createElement("div");
       node.className = "msg user"; node.dataset.role = "user";
       if (image) { const img = document.createElement("img"); img.src = image.dataURL; img.alt = ""; node.appendChild(img); }
       node.appendChild(document.createTextNode(text));
-      el.messages.appendChild(node);
-      el.messages.scrollTop = el.messages.scrollHeight;
+      box.appendChild(node);
+      box.scrollTop = box.scrollHeight;
     }
 
-    function addAssistantMessage() {
+    function addAssistantMessage(id) {
+      const box = messagesOf(id);
       const node = document.createElement("div");
       node.className = "msg assistant"; node.dataset.role = "assistant"; node.dataset.done = "0";
       node.innerHTML = `<details class="think" hidden><summary><i data-lucide="brain" class="ic" aria-hidden="true"></i>${t("thinkLabel")}</summary><div class="think-body"></div></details><div class="body cursor"></div><div class="meta" hidden></div>`;
-      el.messages.appendChild(node);
+      box.appendChild(node);
       icons();
-      el.messages.scrollTop = el.messages.scrollHeight;
+      box.scrollTop = box.scrollHeight;
       return node;
     }
 
-    function finishMessage(node, { tokens, seconds, stopped, error }) {
+    function renderAssistant(node, fullText, thinking, done) {
+      const body = node.querySelector(".body");
+      const thinkEl = node.querySelector(".think");
+      if (thinking) {
+        const { think, answer, open } = splitThinking(fullText);
+        thinkEl.hidden = false;
+        thinkEl.querySelector(".think-body").textContent = think;
+        thinkEl.open = open && !done ? true : (open ? thinkEl.open : false);
+        body.textContent = answer;
+      } else {
+        thinkEl.hidden = true;
+        body.textContent = fullText;
+      }
+      body.classList.toggle("cursor", !done);
+      const box = node.parentElement; box.scrollTop = box.scrollHeight;
+    }
+
+    function finishMessage(node, p, { tokens, seconds, stopped, error }) {
       node.dataset.done = "1";
       node.querySelector(".body").classList.remove("cursor");
       const meta = node.querySelector(".meta");
       meta.hidden = false;
       const parts = [];
       if (error) { node.classList.add("error"); node.querySelector(".body").textContent = error; }
-      if (tokens != null) parts.push(`${tokens} ${t("mTokens")}`);
+      if (tokens != null) { parts.push(`${tokens} ${t("mTokens")}`); node.dataset.tokens = tokens; }
       if (seconds != null) parts.push(`${seconds.toFixed(1)} ${t("mTime")}`);
-      if (tokens != null && seconds > 0) { const tps = tokens / seconds; parts.push(`${tps.toFixed(1)} ${t("mTps")}`); el.statTps.textContent = tps.toFixed(1); node.dataset.tps = tps.toFixed(1); }
+      if (tokens != null && seconds > 0) { const tps = tokens / seconds; parts.push(`${tps.toFixed(1)} ${t("mTps")}`); node.dataset.tps = tps.toFixed(1); }
       if (stopped) parts.push(t("stopped"));
-      const p = S.params;
-      parts.push(Number(p.sample) ? `T ${p.temp} · k ${p.topk || "off"} · p ${p.topp === 1 ? "off" : p.topp}` : "greedy");
-      if (p.rep !== 1) parts.push(`rep ${p.rep}`);
-      if (p.ngram) parts.push(`n-gram ${p.ngram}`);
-      if (Number(p.thinking)) parts.push("think");
-      if (Number(p.memory)) parts.push("memory");
+      parts.push(Number(p.sample) ? `T ${p.temp}` : t("sumDet"));
       meta.innerHTML = parts.map((x) => `<span>${escapeHtml(x)}</span>`).join("");
-      if (tokens != null) node.dataset.tokens = tokens;
     }
 
     // ─── Model loading ───
     async function loadModel() {
+      el.modelBody.hidden = false;
       if (!navigator.gpu) { el.gpuWarn.hidden = false; return; }
       el.loadError.hidden = true;
       el.progressWrap.hidden = false;
@@ -973,6 +946,7 @@
         const warmInputs = await S.processor(warm);
         await S.model.generate({ ...warmInputs, max_new_tokens: 1 });
         el.progressWrap.hidden = true;
+        el.modelBody.hidden = true;
         setStatus("ready");
         announce(t("liveLoaded"));
         el.msgInput.focus();
@@ -986,28 +960,24 @@
     }
 
     // ─── Generation ───
-    async function send(text, image) {
-      if (S.status !== "ready") return;
-      const p = readParams();
+    async function generateInPanel(id, text, image) {
+      const p = S.panels[id];
       const thinking = Number(p.thinking) === 1;
       const memory = Number(p.memory) === 1;
+      const userText = (p.variant && p.variant.trim()) ? p.variant.trim() : text;
 
-      addUserMessage(text, image);
-
-      const messages = [];
-      if (p.sys.trim()) messages.push({ role: "system", content: [{ type: "text", text: p.sys.trim() }] });
-      if (memory) messages.push(...S.history);
+      addUserMessage(id, userText, image);
+      const messages = [{ role: "system", content: [{ type: "text", text: sysOf(p) }] }];
+      if (memory) messages.push(...p.history);
       const content = [];
       if (image) content.push({ type: "image" });
-      content.push({ type: "text", text });
+      content.push({ type: "text", text: userText });
       messages.push({ role: "user", content });
 
-      const node = addAssistantMessage();
-      setStatus("generating");
+      const node = addAssistantMessage(id);
       S.stopper = new InterruptableStoppingCriteria();
       const t0 = performance.now();
       let full = "";
-      let stopped = false;
       try {
         const prompt = S.processor.apply_chat_template(messages, { add_generation_prompt: true, enable_thinking: thinking });
         const inputs = image ? await S.processor(prompt, [image.raw]) : await S.processor(prompt);
@@ -1018,44 +988,53 @@
         });
         const out = await S.model.generate({ ...inputs, ...buildGenerationOptions(p), streamer, stopping_criteria: S.stopper });
         const newTokens = out.dims.at(-1) - inputLen;
-        stopped = S.stopper.interrupted === true;
+        const stopped = S.stopper.interrupted === true;
         renderAssistant(node, full, thinking, true);
-        finishMessage(node, { tokens: newTokens, seconds: (performance.now() - t0) / 1000, stopped });
-        const answer = thinking ? splitThinking(full).answer : full;
+        finishMessage(node, p, { tokens: newTokens, seconds: (performance.now() - t0) / 1000, stopped });
         if (memory) {
-          S.history.push({ role: "user", content: [{ type: "text", text }] });
-          S.history.push({ role: "assistant", content: [{ type: "text", text: answer }] });
+          const answer = thinking ? splitThinking(full).answer : full;
+          p.history.push({ role: "user", content: [{ type: "text", text: userText }] });
+          p.history.push({ role: "assistant", content: [{ type: "text", text: answer }] });
         }
-        announce(t("liveDone"));
       } catch (err) {
         console.error(err);
-        finishMessage(node, { error: String(err && err.message || err), seconds: (performance.now() - t0) / 1000 });
+        finishMessage(node, p, { error: String(err && err.message || err), seconds: (performance.now() - t0) / 1000 });
       } finally {
         S.stopper = null;
-        setStatus("ready");
       }
     }
 
     async function sendFromComposer(times = 1) {
       const text = el.msgInput.value.trim();
       const image = S.attached;
-      if (!text && !image) return;
+      if ((!text && !image) || S.status !== "ready") return;
       el.msgInput.value = "";
+      el.msgInput.style.height = "auto";
       detachImage();
-      updateSendState();
-      for (let i = 0; i < times; i++) {
-        if (S.status !== "ready") break;
-        await send(text, i === 0 ? image : null);
+      setStatus("generating");
+      S.abortRun = false;
+      try {
+        for (let i = 0; i < times && !S.abortRun; i++) {
+          for (const id of activePanels()) {
+            if (S.abortRun) break;
+            await generateInPanel(id, text, i === 0 ? image : null);
+          }
+        }
+      } finally {
+        setStatus("ready");
+        announce(t("liveDone"));
+        el.msgInput.focus();
       }
-      el.msgInput.focus();
     }
 
-    function stop() { if (S.stopper) S.stopper.interrupt(); }
+    function stop() { S.abortRun = true; if (S.stopper) S.stopper.interrupt(); }
 
     function clearChat() {
-      el.messages.querySelectorAll(".msg:not(.empty)").forEach((n) => n.remove());
-      el.emptyMsg.hidden = false;
-      S.history = [];
+      for (const id of ["a", "b"]) {
+        messagesOf(id).querySelectorAll(".msg:not(.empty)").forEach((n) => n.remove());
+        messagesOf(id).querySelector("[data-empty]").hidden = false;
+        S.panels[id].history = [];
+      }
       detachImage();
     }
 
@@ -1069,43 +1048,57 @@
     function applyExperiment(id) {
       const x = EXPERIMENTS.find((e) => e.id === id);
       if (!x) return;
-      const set = { ...x.set };
-      S.params = { ...S.params, ...set, sys: set.sys ? set.sys[S.lang] : DEFAULTS.sys[S.lang], minTok: set.minTok ?? 0 };
-      writeParams();
+      for (const side of ["a", "b"]) {
+        const set = { ...x[side] };
+        if (set.sys != null) set.sys = localized(set.sys);
+        S.panels[side] = { ...PANEL_DEFAULT, ...set, history: [] };
+      }
+      S.editing = "a";
+      setCompare(1);
       el.msgInput.value = x[S.lang].prompt;
-      updateSendState();
+      el.msgInput.dispatchEvent(new Event("input"));
       el.body.dataset.experiment = id;
-      document.querySelectorAll("[data-applied]").forEach((n) => { n.hidden = true; });
-      const note = el.tiles.querySelector(`[data-exp="${id}"] [data-applied]`);
-      if (note) note.hidden = false;
-      document.getElementById("sec-bench").scrollIntoView({ behavior: "smooth", block: "start" });
+      el.dlgExp.close();
+      document.querySelector(".composer-card").scrollIntoView({ behavior: "smooth", block: "end" });
       setTimeout(() => el.msgInput.focus({ preventScroll: true }), 400);
     }
 
-    function resetParams() {
-      S.params = { ...DEFAULTS, sys: DEFAULTS.sys[S.lang] };
-      writeParams();
+    function resetPanel() {
+      S.panels[S.editing] = { ...PANEL_DEFAULT, history: [] };
       delete el.body.dataset.experiment;
-      document.querySelectorAll("[data-applied]").forEach((n) => { n.hidden = true; });
+      writeSettings(); renderSummaries();
+    }
+
+    function openSheet(id, panel) {
+      if (panel) { S.editing = panel; writeSettings(); }
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.open === id));
+      $(id).showModal();
     }
 
     // ─── Listeners ───
+    document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => openSheet(b.dataset.open)));
+    document.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => openSheet("dlgSettings", b.dataset.edit)));
+    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
+    document.querySelectorAll("dialog.sheet").forEach((d) => {
+      d.addEventListener("close", () => document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active")));
+      d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
+    });
     document.querySelectorAll("[data-lang-btn]").forEach((b) => b.addEventListener("click", () => {
       S.lang = b.dataset.langBtn;
       try { localStorage.setItem(LANG_KEY, S.lang); } catch (_) {}
       applyI18n();
     }));
-
+    document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => { S.editing = b.dataset.pick; writeSettings(); }));
+    document.querySelectorAll("[data-sw-compare]").forEach((b) => b.addEventListener("click", () => setCompare(Number(b.dataset.swCompare))));
     document.querySelectorAll("[data-sw]").forEach((b) => b.addEventListener("click", () => {
-      S.params[b.dataset.sw] = Number(b.dataset.val);
-      if (b.dataset.sw === "memory" && Number(b.dataset.val) === 0) S.history = [];
-      writeParams();
+      const p = S.panels[S.editing];
+      p[b.dataset.sw] = Number(b.dataset.val);
+      if (b.dataset.sw === "memory" && Number(b.dataset.val) === 0) p.history = [];
+      writeSettings(); renderSummaries();
     }));
-
-    for (const input of [el.tempInput, el.topkInput, el.toppInput, el.repInput, el.ngramInput, el.maxTok, el.minTok, el.sysInput]) {
-      input.addEventListener("input", () => { readParams(); writeParams(); });
-    }
-    el.btnReset.addEventListener("click", resetParams);
+    for (const input of [el.sysInput, el.tempInput, el.maxTok, el.variantInput]) input.addEventListener("input", readSettings);
+    el.btnReset.addEventListener("click", resetPanel);
+    el.btnCompare.addEventListener("click", () => setCompare(!S.compare));
     el.btnLoad.addEventListener("click", loadModel);
     el.btnSend.addEventListener("click", () => sendFromComposer(1));
     el.btnRepeat.addEventListener("click", () => sendFromComposer(3));
@@ -1142,10 +1135,10 @@
 
     // ─── Init ───
     try { const saved = localStorage.getItem(LANG_KEY); if (saved === "pl" || saved === "en") S.lang = saved; } catch (_) {}
-    S.params.sys = DEFAULTS.sys[S.lang];
-    writeParams();
     applyI18n();
-    if (!navigator.gpu) el.gpuWarn.hidden = false;
+    writeSettings();
+    renderSummaries();
+    if (!navigator.gpu) { el.modelBody.hidden = false; el.gpuWarn.hidden = false; }
 
     // ─── Reveal ───
     Promise.race([

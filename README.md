@@ -5,23 +5,27 @@ An educational playground: the same question, different generation settings, dif
 
 Live: https://workszop.github.io/qwen/
 
-## What you can control
+## How it works
 
-| Parameter | Acts on | Notes |
-|---|---|---|
-| System prompt | input | role, language, style |
-| Conversation memory | input | off = every message is a fresh start |
-| Thinking mode | chat template | `enable_thinking` flag, reasoning shown in a collapsible block |
-| Greedy vs sampling | token choice | greedy = identical answers every time |
-| Temperature | logits | 0.1 to 2.0 |
-| Top-k, Top-p | filters | 0 / 1.0 = off |
-| Repetition penalty, no-repeat n-gram | logits / filter | watch the language break above 1.5 |
-| Max / min new tokens | stopping | min blocks the end token |
-| Image | input | multimodal, 448×448 |
+Two panels, A and B, get the same message with different settings and answer side by side.
+Top menu: **Experiments** (seven ready A/B set-ups), **Settings** (per panel), **Glossary**.
 
-A random seed is not available: Transformers.js samples with `Math.random`, so use greedy decoding when you need repeatability.
+| Setting | Notes |
+|---|---|
+| System prompt | role, language, style |
+| Conversation memory | off = every message is a fresh start |
+| Thinking mode | `enable_thinking` flag, reasoning shown in a collapsible block |
+| Deterministic vs random | deterministic = identical answers every time (greedy, temperature 0) |
+| Temperature | 0.1 to 2.0, random mode only |
+| Max tokens | hard stop |
+| Question variant (panel B) | send a different text to B, e.g. the same question in English |
+| Image | multimodal, 448×448 |
 
-Nine preset experiments set the parameters and fill in a prompt. The ×3 button sends the same message three times to show the spread. PL / EN, language persisted in `localStorage`.
+Top-k, top-p and repetition penalties are left at the model defaults on purpose; the app is for
+first contact with LLM parameters. A random seed is not available: Transformers.js samples with
+`Math.random`, so use deterministic decoding when you need repeatability.
+
+The ×3 button sends the same message three times to show the spread. PL / EN, language persisted in `localStorage`.
 
 ## Run locally
 
