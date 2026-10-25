@@ -555,7 +555,9 @@
     const IMAGE_SIZE = 448;
     const FONT_WAIT_MS = 1500;
     const BRAND_FONTS = ['400 1em Outfit', '700 1em Outfit', '400 1em "IBM Plex Sans"', '600 1em "IBM Plex Sans"', '400 1em "Roboto Mono"'];
-    const SYS_DEFAULT = { pl: "Jesteś pomocnym asystentem. Odpowiadaj krótko.", en: "You are a helpful assistant. Answer briefly." };
+    // Language-neutral on purpose: a Polish instruction pulls every answer into Polish, an English
+    // one with an explicit rule lets the model follow the language of the question.
+    const SYS_DEFAULT = { pl: "You are a helpful assistant. Answer briefly, in the same language as the user's message.", en: "You are a helpful assistant. Answer briefly, in the same language as the user's message." };
     const PANEL_DEFAULT = { sys: "", memory: 0, thinking: 0, sample: 1, temp: 0.7, maxTok: 200, variant: "" };
 
     const T = {
@@ -579,7 +581,7 @@
         mTokens: "tok.", mTps: "tok./s", mTime: "s",
         editPanel: "Panel", compare: "Porównanie A/B", reset: "Domyślne",
         gPrompt: "Prompt i kontekst", sysPrompt: "Prompt systemowy",
-        sysHint: "Instrukcja, którą model widzi przed Twoją wiadomością. Nadaje rolę, język i styl.",
+        sysHint: "Instrukcja, którą model widzi przed Twoją wiadomością. Nadaje rolę, język i styl. Domyślna jest po angielsku, bo instrukcja po polsku ciągnie każdą odpowiedź w polski.",
         memory: "Pamięć rozmowy", memoryHint: "Wyłączona: każda wiadomość to nowy start. Włączona: model widzi poprzednie tury.",
         thinking: "Tryb myślenia", thinkingHint: "Model najpierw pisze rozumowanie, potem odpowiedź. Wolniej, ale często trafniej.",
         on: "wł.", off: "wył.",
@@ -617,7 +619,7 @@
         mTokens: "tok", mTps: "tok/s", mTime: "s",
         editPanel: "Panel", compare: "A/B comparison", reset: "Defaults",
         gPrompt: "Prompt and context", sysPrompt: "System prompt",
-        sysHint: "The instruction the model sees before your message. It sets role, language and style.",
+        sysHint: "The instruction the model sees before your message. It sets role, language and style. The default is in English so the model follows the language of the question.",
         memory: "Conversation memory", memoryHint: "Off: every message is a fresh start. On: the model sees previous turns.",
         thinking: "Thinking mode", thinkingHint: "The model writes its reasoning first, then the answer. Slower, often more accurate.",
         on: "on", off: "off",
