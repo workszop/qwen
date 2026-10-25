@@ -1,521 +1,1157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Qwen 0.8B Local Chat · edulab</title>
+  <title>Mały model w przeglądarce · edulab</title>
+  <meta name="description" content="Qwen3.5 0.8B running locally in the browser on WebGPU. An educational playground for temperature, top-k, top-p, repetition penalty, thinking mode, system prompts and non-English prompts." />
 
-  <!-- edulab fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    @keyframes boot-reveal { to { visibility: visible; } }
+    html:not(.app-ready) body { visibility: hidden; animation: boot-reveal 0s 4s forwards; }
+    @media print { html:not(.app-ready) body { visibility: visible; animation: none; } }
+  </style>
+  <noscript><style>html:not(.app-ready) body { visibility: visible; animation: none; }</style></noscript>
 
   <style>
     /* ============================================================
-       edulab — Colors & Type tokens (design system source of truth)
+       edulab - Colors & Type foundation (tokens/colors_and_type.css)
        ============================================================ */
     :root {
-      --font-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
-      --font-sans:    'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-      --font-mono:    'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --font-display: 'Outfit', 'IBM Plex Sans', system-ui, sans-serif;
+      --font-sans:    'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      --font-mono:    'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-      --paper:    #FBF7F0;  --paper-2: #F4EDDF;  --paper-3: #ECE1CF;  --surface: #FFFFFF;
-      --ink:      #211E1A;  --ink-2:   #5B554D;  --ink-3:   #938A7C;
-      --line:     #E7DCCB;  --line-2:  #D6C8B2;
+      --paper:    #FFFFFF;
+      --paper-2:  #F5F3F0;
+      --paper-3:  #EAE6E0;
+      --surface:  #FFFFFF;
 
-      --marigold: #E8920C;  --marigold-600: #CE800A;  --marigold-soft: #FBE7C2;  --marigold-ink: #8A4F00;
-      --teal:     #0E8C7F;  --teal-600:     #0B7468;  --teal-soft:     #D2EBE6;  --teal-ink:     #0A5A52;
-      --coral:    #EF5B3F;  --coral-600:    #D44A30;  --coral-soft:    #FBDDD4;  --coral-ink:    #9A2E1B;
-      --sky:      #2E78C9;  --sky-soft:     #D9E7F6;  --sky-ink:       #1B4E88;
+      --ink:      #1C1917;
+      --ink-2:    #44403C;
+      --ink-3:    #625B53;
+      --line:     #E0DBD3;
+      --line-2:   #C9C2B7;
+      --line-strong: #857C69;
+
+      --yellow:      #FFD500;
+      --yellow-600:  #F0C800;
+      --yellow-soft: #FFD500;
+      --yellow-ink:  #1C1917;
+
+      --blue:      #1E8FC2;
+      --blue-600:  #177AA8;
+      --blue-soft: #177AA8;
+      --blue-ink:  #FFFFFF;
+
+      --green:      #00A651;
+      --green-600:  #078342;
+      --green-soft: #078342;
+      --green-ink:  #FFFFFF;
+
+      --red:      #E5322D;
+      --red-600:  #C92823;
+      --red-soft: #C92823;
+      --red-ink:  #FFFFFF;
+
+      --grape:      #7A5AC2;
+      --grape-soft: #7A5AC2;
+      --grape-ink:  #FFFFFF;
+
+      --marigold: var(--yellow); --marigold-600: var(--yellow-600); --marigold-soft: var(--yellow-soft); --marigold-ink: var(--yellow-ink);
+      --teal:     var(--blue);   --teal-600:     var(--blue-600);   --teal-soft:     var(--blue-soft);   --teal-ink:     var(--blue-ink);
+      --sky:      var(--green);                                     --sky-soft:      var(--green-soft);  --sky-ink:      var(--green-ink);
+      --coral:    var(--red);    --coral-600:    var(--red-600);    --coral-soft:    var(--red-soft);    --coral-ink:    var(--red-ink);
+
+      --play-sun:    #FFD500;
+      --play-grass:  #00A651;
+      --play-berry:  #C6478B;
+      --play-grape:  #7A5AC2;
+      --play-sky:    #1E8FC2;
+      --play-coral:  #E5322D;
+
+      --success:      #00A651;  --success-soft: #078342;  --success-ink: #FFFFFF;
+      --warning:      #FFD500;  --warning-soft: #FFD500;  --warning-ink: #1C1917;
+      --danger:       #E5322D;  --danger-soft:  #C92823;  --danger-ink:  #FFFFFF;
+      --info:         #1E8FC2;  --info-soft:    #177AA8;  --info-ink:    #FFFFFF;
+
+      --bg:        var(--paper);
+      --fg:        var(--ink);
+      --fg-muted:  var(--ink-2);
+      --primary:   var(--yellow);
+      --on-primary:#1C1917;
+      --focus-ring: 0 0 0 2px var(--paper), 0 0 0 5px var(--ink);
+      --track: color-mix(in srgb, var(--ink) 24%, transparent);
+
+      --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+      --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+      --sp-12: 48px; --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
 
       --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
 
-      --shadow-sm: 0 1px 2px rgba(33,30,26,.06), 0 1px 1px rgba(33,30,26,.04);
-      --shadow-md: 0 4px 16px rgba(33,30,26,.08), 0 1px 3px rgba(33,30,26,.05);
+      --shadow-sm: 0 1px 2px rgba(33,30,26,.10), 0 2px 6px rgba(33,30,26,.06);
+      --shadow-md: 0 6px 18px rgba(33,30,26,.12), 0 1px 3px rgba(33,30,26,.08);
       --shadow-lg: 0 16px 40px rgba(33,30,26,.12), 0 3px 8px rgba(33,30,26,.06);
-      --shadow-marigold: 0 8px 22px rgba(232,146,12,.28);
-      --focus-ring: 0 0 0 3px rgba(232,146,12,.38);
+      --shadow-primary:  0 8px 22px color-mix(in srgb, var(--yellow) 30%, transparent);
+      --shadow-marigold: var(--shadow-primary);
+
+      --display-font:  clamp(48px, 6vw, 72px);
+      --h1: 44px; --h2: 33px; --h3: 25px; --h4: 19px;
+      --body-lg: 18px; --body: 16px; --body-sm: 14px;
+      --caption: 13px; --overline: 12px;
     }
 
+    .edu-display, :where(.edu) h1.display { font-family: var(--font-display); font-weight: 700; font-size: var(--display-font); line-height: 1.02; letter-spacing: -0.025em; color: var(--ink); }
+    :where(.edu) h1, .edu-h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--h1); line-height: 1.06; letter-spacing: -0.02em; color: var(--ink); }
+    :where(.edu) h2, .edu-h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--h2); line-height: 1.12; letter-spacing: -0.015em; color: var(--ink); }
+    :where(.edu) h3, .edu-h3 { font-family: var(--font-display); font-weight: 700; font-size: var(--h3); line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); }
+    :where(.edu) h4, .edu-h4 { font-family: var(--font-sans); font-weight: 700; font-size: var(--h4); line-height: 1.3; color: var(--ink); }
+    :where(.edu) p, .edu-p, .edu-body { font-family: var(--font-sans); font-weight: 400; font-size: var(--body); line-height: 1.6; color: var(--ink-2); }
+    .edu-body-lg { font-family: var(--font-sans); font-size: var(--body-lg); line-height: 1.6; color: var(--ink-2); }
+    .edu-small  { font-family: var(--font-sans); font-size: var(--body-sm); line-height: 1.5; color: var(--ink-2); }
+    .edu-caption{ font-family: var(--font-sans); font-size: var(--caption); line-height: 1.45; color: var(--ink-3); }
+    .edu-overline { font-family: var(--font-mono); font-weight: 500; font-size: var(--overline); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+    :where(.edu) code, .edu-mono { font-family: var(--font-mono); font-size: 0.92em; color: var(--ink); background: var(--paper-3); padding: 0.12em 0.4em; border-radius: var(--r-xs); }
+    .edu-block, .edu-block h1, .edu-block h2, .edu-block h3, .edu-block h4, .edu-block p, .edu-block li, .edu-block small { color: inherit; }
+    body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+
+    /* ============================================================
+       Base
+       ============================================================ */
     * { box-sizing: border-box; }
-
-    /* --- Base --- */
-    body {
-      font-family: var(--font-sans);
-      background: var(--paper);
-      color: var(--ink);
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; padding: 0; }
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1; }
+    :focus-visible { outline: 3px solid transparent; outline-offset: 2px; box-shadow: var(--focus-ring); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .ic { width: 18px; height: 18px; flex: none; }
 
     /* ============================================================
-       Branded top menu (shared edulab chrome)
+       Branded top menu
        ============================================================ */
-    .edu-header {
-      position: sticky; top: 0; z-index: 50; width: 100%;
-      background: rgba(251, 247, 240, 0.85);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line);
-    }
-    .edu-header-inner {
-      max-width: 1100px; margin: 0 auto;
-      padding: 13px 30px; display: flex; align-items: center; gap: 12px;
-    }
-    .edu-logo { width: 30px; height: 30px; display: block; }
-    .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: -.02em; color: var(--ink); }
-    .edu-tag {
-      font-family: var(--font-mono); font-weight: 500; font-size: 11px;
-      letter-spacing: .14em; text-transform: uppercase; color: var(--teal-ink);
-      background: var(--teal-soft); padding: 4px 9px; border-radius: var(--r-pill);
-    }
+    .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
+    .edu-header-inner { max-width: 1100px; margin: 0 auto; padding: 8px 30px; display: flex; align-items: center; gap: 12px; }
+    .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
+    .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
+    .edu-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); margin-left: auto; }
+    .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--ink-2); cursor: pointer; box-shadow: none; }
+    .edu-seg button.active { background: var(--yellow); color: var(--yellow-ink); }
 
     /* ============================================================
-       Screens
+       Page header
        ============================================================ */
-    .screen {
-      display: none;
-      flex: 1;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px;
-    }
-    .screen.active { display: flex; }
-
-    /* Page header scheme (eyebrow → solid-ink title → lead) */
-    .edu-overline {
-      font-family: var(--font-mono); font-weight: 500; font-size: 12px;
-      letter-spacing: 0.14em; text-transform: uppercase; color: var(--marigold-ink);
-      margin: 0 0 14px;
-    }
-    h1 {
-      font-family: var(--font-display); font-weight: 800;
-      font-size: clamp(2rem, 4.5vw, 2.85rem); letter-spacing: -.025em;
-      line-height: 1.05; color: var(--ink);
-      margin: 0 0 14px; text-align: center;
-    }
-    h2 {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: clamp(1.6rem, 3.5vw, 2.1rem); letter-spacing: -.02em;
-      color: var(--ink); margin: 0 0 14px; text-align: center;
-    }
-    .edu-lead {
-      font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.6;
-      color: var(--ink-2); max-width: 36rem; margin: 0 auto 26px; text-align: center;
-    }
-
-    /* --- Buttons --- */
-    button {
-      font-family: var(--font-display); font-weight: 600; font-size: 1rem;
-      padding: 12px 24px;
-      border-radius: var(--r-pill);
-      border: none;
-      background: var(--marigold);
-      color: #fff;
-      cursor: pointer;
-      box-shadow: var(--shadow-marigold);
-      transition: background .15s ease, transform .12s cubic-bezier(.32,.72,.32,1);
-    }
-    button:hover { background: var(--marigold-600); }
-    button:active { transform: scale(.97); }
-    button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
-    button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .page-head { max-width: 1100px; margin: 0 auto; padding: 44px 30px 52px; text-align: left; }
+    .app-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 5vw, 3.3rem); letter-spacing: -.025em; line-height: 1.05; color: var(--ink); margin: 0 0 14px; }
+    .edu-lead { font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
 
     /* ============================================================
-       Chat Area
+       Section bands
        ============================================================ */
-    #chat { justify-content: flex-start; padding: 0; }
-    .chat-header {
-      width: 100%;
-      padding: 16px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .chat-status {
-      font-family: var(--font-mono); font-weight: 500; font-size: 11px;
-      letter-spacing: .12em; text-transform: uppercase; color: var(--teal-ink);
-      background: var(--teal-soft); padding: 5px 12px; border-radius: var(--r-pill);
-      display: inline-flex; align-items: center; gap: 7px;
-    }
+    .sec { margin: 0; padding: 52px 0 60px; border-top: 1px solid var(--line); scroll-margin-top: 82px; }
+    .sec:nth-of-type(odd) { background: var(--paper-2); }
+    .sec > .wrap { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
+    .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+    .sec-head h2 { margin: 0; }
+    .sec-head::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
 
-    /* System Prompt Input */
-    .system-prompt-container {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      max-width: 800px;
-      font-family: var(--font-mono); font-size: 0.78rem;
-      letter-spacing: .04em; text-transform: uppercase;
-      color: var(--ink-3);
-    }
-    .system-prompt-container input {
-      flex: 1;
-      max-width: 480px;
-      padding: 9px 12px;
-      border-radius: var(--r-sm);
-      background: var(--paper);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      font-family: var(--font-sans);
-      font-size: 0.9rem; text-transform: none; letter-spacing: normal;
-      outline: none;
-    }
-    .system-prompt-container input:focus { border-color: var(--marigold); box-shadow: var(--focus-ring); }
+    /* ============================================================
+       Cards, badges, tones
+       ============================================================ */
+    .card { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; }
+    .card-head { padding: 14px 22px; background: var(--paper-2); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-head h3 { margin: 0; font-size: 20px; }
+    .card-body { padding: 20px 22px; flex: 1; }
+    .card-foot { padding: 14px 22px; border-top: 1px dashed var(--line-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .tile-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .tile-h h3 { margin: 0; font-size: 18px; line-height: 1.3; }
 
-    .chat-messages {
-      flex: 1;
-      width: 100%;
-      max-width: 800px;
-      overflow-y: auto;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
+    .tone-grape  { background: var(--grape-soft);  color: var(--grape-ink); }
+    .tone-blue   { background: var(--blue-soft);   color: var(--blue-ink); }
+    .tone-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
+    .tone-green  { background: var(--green-soft);  color: var(--green-ink); }
+    .tone-red    { background: var(--red-soft);    color: var(--red-ink); }
+    .tone-ink    { background: var(--ink);         color: var(--paper); }
+    .tone-stone  { background: var(--paper-3);     color: var(--ink); }
+    .badge { flex: none; width: 34px; height: 34px; border-radius: var(--r-sm); display: inline-grid; place-items: center; }
+    .badge-lg { width: 46px; height: 46px; border-radius: var(--r-md); }
+    .badge-lg .ic { width: 24px; height: 24px; }
+    .badge.tone-ink { color: var(--yellow); }
 
-    /* Message Bubbles */
-    .msg {
-      font-family: var(--font-sans);
-      padding: 14px 18px;
-      border-radius: var(--r-lg);
-      max-width: 80%;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .msg.user {
-      align-self: flex-end;
-      background: var(--marigold-soft);
-      color: var(--marigold-ink);
-      border-bottom-right-radius: var(--r-xs);
-    }
-    .msg.assistant {
-      align-self: flex-start;
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      border-bottom-left-radius: var(--r-xs);
-      box-shadow: var(--shadow-sm);
-    }
-    .msg img { max-width: 250px; border-radius: var(--r-md); display: block; margin-bottom: 10px; border: 1px solid var(--line); }
+    .edu-chip { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .edu-chip .ic { width: 13px; height: 13px; }
 
-    /* Input & Settings Area */
-    .chat-bottom-container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      background: var(--paper);
-      border-top: 1px solid var(--line);
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-    .chat-settings {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding: 12px 20px;
-      background: var(--paper-2);
-      font-family: var(--font-mono); font-size: 0.78rem;
-      letter-spacing: .04em; text-transform: uppercase;
-      color: var(--ink-2);
-      align-items: center;
-      border-bottom: 1px solid var(--line);
-    }
-    .chat-settings label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .chat-settings input[type="range"] {
-      width: 90px;
-      accent-color: var(--marigold);
-    }
-    .chat-settings input[type="number"] {
-      width: 64px;
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      border-radius: var(--r-xs);
-      padding: 5px 7px;
-      font-family: var(--font-mono);
-    }
-    .chat-settings input[type="number"]:focus { outline: none; border-color: var(--marigold); box-shadow: var(--focus-ring); }
-    #tempDisplay { color: var(--marigold-ink); font-weight: 500; }
+    /* ============================================================
+       Buttons
+       ============================================================ */
+    button { font: inherit; cursor: pointer; }
+    .edu-btn { font-family: var(--font-display); font-weight: 600; font-size: 1rem; background: var(--yellow); color: var(--on-primary); border: none; border-radius: var(--r-pill); padding: 12px 22px; box-shadow: var(--shadow-primary); display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s ease, transform .12s cubic-bezier(.32,.72,.32,1); }
+    .edu-btn:hover  { background: var(--yellow-600); }
+    .edu-btn:active { transform: scale(.96); }
+    .edu-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 10px 18px; font-family: var(--font-display); font-weight: 600; font-size: .95rem; display: inline-flex; align-items: center; gap: 8px; transition: background-color .15s ease; }
+    .btn-ghost:hover { background: var(--paper-2); }
+    .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-danger { background: var(--red-soft); color: var(--red-ink); border: none; }
+    .btn-danger:hover { background: var(--red-600); }
+    .btn-icon { padding: 10px 12px; }
+    .btn-sm { padding: 7px 14px; font-size: .85rem; }
 
-    /* Clear Button Styling */
-    #btnClearChat {
-      margin-left: auto;
-      padding: 7px 14px;
-      font-family: var(--font-mono); font-size: 0.72rem;
-      letter-spacing: .08em; text-transform: uppercase;
-      background: var(--surface);
-      color: var(--ink-2);
-      border: 1px solid var(--line);
-      box-shadow: none;
-    }
-    #btnClearChat:hover { background: var(--paper-3); color: var(--ink); }
+    /* ============================================================
+       Model card (landing / loading)
+       ============================================================ */
+    .model-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: stretch; }
+    .model-facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+    .model-facts li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .model-facts .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+    .model-facts .v { font-family: var(--font-sans); font-weight: 600; color: var(--ink); font-size: 15px; }
+    .progress { height: 10px; border-radius: var(--r-pill); background: var(--paper-3); overflow: hidden; }
+    .progress > span { display: block; height: 100%; width: 0; background: var(--yellow); border-radius: var(--r-pill); transition: width .25s ease; }
+    .progress-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
+    .progress-meta b { color: var(--ink); font-weight: 500; }
+    .callout { border-radius: var(--r-md); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; }
+    .callout p { margin: 0; font-size: 15px; line-height: 1.5; }
+    .callout .ic { margin-top: 2px; }
+    .dark-panel { background: var(--ink); color: var(--paper); border-radius: var(--r-xl); padding: 26px 28px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+    .dark-panel .edu-overline { color: rgba(255,255,255,.62); }
+    .dark-panel .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.14); font-size: 15px; }
+    .dark-panel .row:last-child { border-bottom: none; }
+    .dark-panel .row b { font-family: var(--font-display); font-weight: 600; font-size: 20px; color: var(--yellow); }
 
-    .chat-input-area {
-      display: flex;
-      gap: 10px;
-      padding: 16px 20px 6px 20px;
-    }
-    textarea {
-      flex: 1;
-      padding: 13px 14px;
-      border-radius: var(--r-md);
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      resize: none;
-      font-family: var(--font-sans);
-      font-size: 0.95rem;
-      outline: none;
-    }
-    textarea::placeholder { color: var(--ink-3); }
-    textarea:focus { border-color: var(--marigold); box-shadow: var(--focus-ring); }
+    /* ============================================================
+       Workbench: parameters + chat
+       ============================================================ */
+    .bench { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: stretch; }
+    .params .card-body { padding: 6px 22px 18px; }
+    .pgroup { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .pgroup:last-child { border-bottom: none; }
+    .pgroup-h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .pgroup-h .edu-overline { margin: 0; }
+    .pgroup-h .badge { width: 28px; height: 28px; border-radius: var(--r-xs); }
+    .pgroup-h .badge .ic { width: 15px; height: 15px; }
+    .field { margin: 10px 0 0; }
+    .field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .field label, .field .label { font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
+    .field .val { font-family: var(--font-mono); font-size: 13px; color: var(--ink); font-weight: 500; min-width: 3.5ch; text-align: right; font-variant-numeric: tabular-nums; }
+    .field .hint { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+    .input, textarea.input { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: inherit; font-size: 15px; background: var(--surface); color: var(--ink); resize: vertical; }
+    .input::placeholder { color: var(--ink-3); }
+    input[type="range"] { width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: var(--track); border-radius: var(--r-pill); margin: 8px 0 2px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--shadow-sm); cursor: pointer; }
+    input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--shadow-sm); cursor: pointer; }
+    input[type="range"]:disabled { opacity: .4; }
+    .num { width: 92px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); font-family: var(--font-mono); font-size: 14px; color: var(--ink); background: var(--surface); }
+    .switch { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); }
+    .switch button { border: none; background: transparent; padding: 6px 12px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; font-size: 13px; color: var(--ink-2); box-shadow: none; }
+    .switch button.active { background: var(--yellow); color: var(--yellow-ink); }
+    .switch.sw-blue button.active { background: var(--blue-soft); color: var(--blue-ink); }
 
-    /* Attach button — neutral, not primary */
-    #btnAttach {
-      background: var(--surface);
-      color: var(--ink-2);
-      border: 1px solid var(--line);
-      box-shadow: none;
-      padding: 12px 16px;
-    }
-    #btnAttach:hover { background: var(--paper-3); color: var(--ink); }
+    .chat { min-height: 640px; }
+    .chat-head-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .messages { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 380px; max-height: 72vh; overflow-y: auto; }
+    .msg { max-width: 82%; padding: 13px 16px; border-radius: var(--r-lg); line-height: 1.55; font-size: 15.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .msg.user { align-self: flex-end; background: var(--yellow-soft); color: var(--yellow-ink); border-bottom-right-radius: var(--r-xs); }
+    .msg.assistant { align-self: flex-start; background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); border-bottom-left-radius: var(--r-xs); box-shadow: var(--shadow-sm); }
+    .msg.assistant.error { background: var(--red-soft); color: var(--red-ink); border-color: var(--red-soft); }
+    .msg img { max-width: 240px; border-radius: var(--r-md); display: block; margin-bottom: 8px; border: 1px solid var(--line-2); }
+    .msg .think { margin: 0 0 10px; border-radius: var(--r-sm); background: var(--paper-2); border: 1px solid var(--line-2); font-size: 14px; color: var(--ink-2); }
+    .msg .think summary { padding: 8px 12px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); list-style: none; display: flex; align-items: center; gap: 8px; }
+    .msg .think summary::-webkit-details-marker { display: none; }
+    .msg .think .think-body { padding: 0 12px 10px; white-space: pre-wrap; }
+    .msg .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line-2); font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: var(--ink-3); }
+    .msg.assistant.error .meta { border-color: rgba(255,255,255,.4); color: var(--red-ink); }
+    .msg .meta span { white-space: nowrap; }
+    .msg.empty { align-self: stretch; max-width: none; background: var(--paper-2); color: var(--ink-2); border: 1px dashed var(--line-2); text-align: center; padding: 28px 20px; font-size: 15px; }
+    .cursor::after { content: "▍"; color: var(--ink-3); animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .composer { padding: 14px 22px 10px; display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid var(--line); background: var(--paper-2); }
+    .composer textarea { flex: 1; min-height: 46px; max-height: 180px; resize: none; }
+    .attach-preview { display: flex; align-items: center; gap: 10px; padding: 8px 22px 0; font-size: 13px; color: var(--ink-2); background: var(--paper-2); }
+    .attach-preview img { width: 40px; height: 40px; object-fit: cover; border-radius: var(--r-xs); border: 1px solid var(--line-2); }
+    .attach-preview button { margin-left: auto; }
+    .chat .card-foot { background: var(--paper-2); font-size: 13px; color: var(--ink-3); }
+    .kbd { font-family: var(--font-mono); font-size: 11px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); color: var(--ink); background: var(--surface); }
+    .disabled-note { opacity: .5; pointer-events: none; }
 
-    /* Educational Disclaimer Footer */
-    .disclaimer {
-      font-family: var(--font-mono);
-      text-align: center;
-      padding: 12px 20px 16px;
-      font-size: 0.72rem;
-      letter-spacing: .03em;
-      color: var(--ink-3);
+    /* ============================================================
+       Experiments tiles
+       ============================================================ */
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .tiles .card-body p { margin: 0 0 12px; font-size: 15px; }
+    .tiles .card-body p:last-child { margin: 0; }
+    .tiles .settings { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tiles .settings .edu-chip { background: var(--paper-3); color: var(--ink); }
+    .tiles .card-foot { justify-content: flex-start; }
+
+    /* ============================================================
+       Glossary table
+       ============================================================ */
+    .table-card .card-body { padding: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    th { text-align: left; padding: 12px 16px; background: var(--paper-3); border-bottom: 1px solid var(--line-2); font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; line-height: 1.5; }
+    tbody tr:nth-child(even) td { background: var(--paper-2); }
+    tbody tr:last-child td { border-bottom: none; }
+    td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+    td.mono { font-family: var(--font-mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
+
+    footer.site { border-top: 1px solid var(--line-2); }
+    footer.site .wrap { max-width: 1100px; margin: 0 auto; padding: 22px 30px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-3); }
+    footer.site a { color: var(--ink); }
+
+    /* ============================================================
+       Responsive
+       ============================================================ */
+    @media (max-width: 1080px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px)  { .bench { grid-template-columns: 1fr; } .model-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .edu-header-inner { padding: 6px 16px; }
+      .page-head { padding: 28px 16px 36px; }
+      .sec { padding: 36px 0 44px; } .sec > .wrap { padding: 0 16px; }
+      .sec-head { flex-direction: row; flex-wrap: wrap; align-items: center; }
+      .sec-head h2 { flex: 1; min-width: 0; }
+      .sec-head::after { flex: 1 0 100%; }
+      .tiles { grid-template-columns: 1fr; }
+      .table-card .card-body { overflow-x: auto; } table { min-width: 640px; }
+      .model-facts { grid-template-columns: 1fr; }
+      .msg { max-width: 94%; }
+      footer.site .wrap { padding: 18px 16px; }
     }
   </style>
 </head>
-<body>
+<body class="edu" data-state="idle" data-lang="pl" data-progress="0">
 
   <header class="edu-header">
     <div class="edu-header-inner">
-      <img class="edu-logo" alt="edulab" src="edulab-mark-teal.png">
+      <img class="edu-logo" alt="edulab" src="edulab-mark-ink.png">
       <span class="edu-wordmark">edulab</span>
-      <span class="edu-tag">demo lab</span>
+      <div class="edu-seg" role="group" aria-label="Language">
+        <button type="button" data-lang-btn="pl" class="active">PL</button>
+        <button type="button" data-lang-btn="en">EN</button>
+      </div>
     </div>
   </header>
 
-  <div id="landing" class="screen active">
-    <p class="edu-overline">Interactive demo · runs in your browser</p>
-    <h1>Qwen 3.5 Vision · 0.8B</h1>
-    <p class="edu-lead">A small language model running 100% locally on your GPU — no server, no API. Built to explore temperature, system prompts, and how models handle non-English languages.</p>
-    <button id="btnLoad">Load Model into Browser</button>
-  </div>
+  <main>
+    <header class="page-head">
+      <h1 class="app-title" data-i18n="title"></h1>
+      <p class="edu-lead" data-i18n="lead"></p>
+    </header>
 
-  <div id="loading" class="screen">
-    <p class="edu-overline">Initializing</p>
-    <h2>Warming up the model…</h2>
-    <p class="edu-lead" id="loaderText">Downloading/loading weights from cache. This may take a minute…</p>
-  </div>
-
-  <div id="chat" class="screen">
-    <div class="chat-header">
-      <div class="chat-status">⚡ Qwen 0.8B active · WebGPU</div>
-      <div class="system-prompt-container">
-        <label for="sysInput">System Prompt</label>
-        <input type="text" id="sysInput" value="You are a helpful and harmless AI assistant." />
+    <!-- ─── Model ─── -->
+    <section class="sec" id="sec-model">
+      <div class="wrap">
+        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secModel"></h2></div>
+        <div class="model-grid">
+          <div class="card" id="modelCard">
+            <div class="card-head">
+              <span class="tile-h"><span class="badge tone-blue"><i data-lucide="download" class="ic" aria-hidden="true"></i></span><h3>Qwen3.5 · 0.8B</h3></span>
+              <span class="edu-chip tone-stone" id="modelChip" data-i18n="stateIdle"></span>
+            </div>
+            <div class="card-body">
+              <ul class="model-facts">
+                <li><span class="k" data-i18n="fParams"></span><span class="v">0.8B</span></li>
+                <li><span class="k" data-i18n="fDownload"></span><span class="v">≈ 850 MB</span></li>
+                <li><span class="k" data-i18n="fRuntime"></span><span class="v">WebGPU · ONNX</span></li>
+                <li><span class="k" data-i18n="fLangs"></span><span class="v" data-i18n="fLangsV"></span></li>
+              </ul>
+              <div id="progressWrap" hidden style="margin-top:18px">
+                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><span></span></div>
+                <div class="progress-meta"><span id="progressFile"></span><b id="progressPct">0%</b></div>
+              </div>
+              <div id="gpuWarn" class="callout tone-red edu-block" hidden style="margin-top:18px">
+                <i data-lucide="info" class="ic" aria-hidden="true"></i><p data-i18n="noGpu"></p>
+              </div>
+              <div id="loadError" class="callout tone-red edu-block" hidden style="margin-top:18px">
+                <i data-lucide="info" class="ic" aria-hidden="true"></i><p id="loadErrorText"></p>
+              </div>
+            </div>
+            <div class="card-foot">
+              <button class="edu-btn" id="btnLoad"><i data-lucide="download" class="ic" aria-hidden="true"></i><span data-i18n="load"></span></button>
+              <span class="edu-caption" data-i18n="loadNote"></span>
+            </div>
+          </div>
+          <div class="dark-panel edu-block">
+            <p class="edu-overline" data-i18n="whyTitle"></p>
+            <div class="row"><span data-i18n="why1"></span><b>0</b></div>
+            <div class="row"><span data-i18n="why2"></span><b>100%</b></div>
+            <div class="row"><span data-i18n="why3"></span><b id="statTps">–</b></div>
+          </div>
+        </div>
       </div>
+    </section>
+
+    <!-- ─── Workbench ─── -->
+    <section class="sec" id="sec-bench">
+      <div class="wrap">
+        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="sliders" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secBench"></h2></div>
+        <div class="bench">
+
+          <div class="card params" id="paramsCard">
+            <div class="card-head">
+              <span class="tile-h"><span class="badge tone-grape"><i data-lucide="sliders" class="ic" aria-hidden="true"></i></span><h3 data-i18n="params"></h3></span>
+              <button class="btn-ghost btn-sm" id="btnReset" type="button"><span data-i18n="reset"></span></button>
+            </div>
+            <div class="card-body">
+
+              <div class="pgroup">
+                <div class="pgroup-h"><span class="badge tone-blue"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gPrompt"></span></div>
+                <div class="field">
+                  <div class="field-row"><label for="sysInput" data-i18n="sysPrompt"></label></div>
+                  <textarea class="input" id="sysInput" rows="3"></textarea>
+                  <p class="hint" data-i18n="sysHint"></p>
+                </div>
+                <div class="field">
+                  <div class="field-row"><span class="label" data-i18n="memory"></span>
+                    <div class="switch sw-blue" role="group"><button type="button" data-sw="memory" data-val="0" class="active" data-i18n="off"></button><button type="button" data-sw="memory" data-val="1" data-i18n="on"></button></div>
+                  </div>
+                  <p class="hint" data-i18n="memoryHint"></p>
+                </div>
+                <div class="field">
+                  <div class="field-row"><span class="label" data-i18n="thinking"></span>
+                    <div class="switch sw-blue" role="group"><button type="button" data-sw="thinking" data-val="0" class="active" data-i18n="off"></button><button type="button" data-sw="thinking" data-val="1" data-i18n="on"></button></div>
+                  </div>
+                  <p class="hint" data-i18n="thinkingHint"></p>
+                </div>
+              </div>
+
+              <div class="pgroup">
+                <div class="pgroup-h"><span class="badge tone-yellow"><i data-lucide="dice-5" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gSampling"></span></div>
+                <div class="field">
+                  <div class="field-row"><span class="label" data-i18n="decoding"></span>
+                    <div class="switch" role="group"><button type="button" data-sw="sample" data-val="0" data-i18n="greedy"></button><button type="button" data-sw="sample" data-val="1" class="active" data-i18n="sampling"></button></div>
+                  </div>
+                  <p class="hint" data-i18n="decodingHint"></p>
+                </div>
+                <div class="field" data-needs-sample>
+                  <div class="field-row"><label for="tempInput" data-i18n="temperature"></label><span class="val" id="tempVal">0.7</span></div>
+                  <input type="range" id="tempInput" min="0.1" max="2" step="0.1" value="0.7" />
+                  <p class="hint" data-i18n="tempHint"></p>
+                </div>
+                <div class="field" data-needs-sample>
+                  <div class="field-row"><label for="topkInput">Top-k</label><span class="val" id="topkVal">20</span></div>
+                  <input type="range" id="topkInput" min="0" max="100" step="1" value="20" />
+                  <p class="hint" data-i18n="topkHint"></p>
+                </div>
+                <div class="field" data-needs-sample>
+                  <div class="field-row"><label for="toppInput">Top-p</label><span class="val" id="toppVal">0.95</span></div>
+                  <input type="range" id="toppInput" min="0.05" max="1" step="0.05" value="0.95" />
+                  <p class="hint" data-i18n="toppHint"></p>
+                </div>
+              </div>
+
+              <div class="pgroup">
+                <div class="pgroup-h"><span class="badge tone-green"><i data-lucide="repeat" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gRepeat"></span></div>
+                <div class="field">
+                  <div class="field-row"><label for="repInput" data-i18n="repPenalty"></label><span class="val" id="repVal">1.0</span></div>
+                  <input type="range" id="repInput" min="1" max="2" step="0.05" value="1" />
+                  <p class="hint" data-i18n="repHint"></p>
+                </div>
+                <div class="field">
+                  <div class="field-row"><label for="ngramInput" data-i18n="noRepeat"></label><span class="val" id="ngramVal">0</span></div>
+                  <input type="range" id="ngramInput" min="0" max="6" step="1" value="0" />
+                  <p class="hint" data-i18n="noRepeatHint"></p>
+                </div>
+              </div>
+
+              <div class="pgroup">
+                <div class="pgroup-h"><span class="badge tone-red"><i data-lucide="ruler" class="ic" aria-hidden="true"></i></span><span class="edu-overline" data-i18n="gLength"></span></div>
+                <div class="field">
+                  <div class="field-row"><label for="maxTok" data-i18n="maxTokens"></label><input class="num" type="number" id="maxTok" min="1" max="2048" value="200" /></div>
+                  <p class="hint" data-i18n="maxHint"></p>
+                </div>
+                <div class="field">
+                  <div class="field-row"><label for="minTok" data-i18n="minTokens"></label><input class="num" type="number" id="minTok" min="0" max="512" value="0" /></div>
+                  <p class="hint" data-i18n="minHint"></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="card chat" id="chatCard">
+            <div class="card-head">
+              <span class="tile-h"><span class="badge tone-yellow"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="chat"></h3></span>
+              <div class="chat-head-meta">
+                <span class="edu-chip tone-stone" id="chatState" data-i18n="chatIdle"></span>
+                <button class="btn-ghost btn-sm" id="btnClear" type="button"><i data-lucide="eraser" class="ic" aria-hidden="true"></i><span data-i18n="clear"></span></button>
+              </div>
+            </div>
+            <div class="messages" id="messages" aria-live="polite" aria-relevant="additions text">
+              <div class="msg empty" id="emptyMsg" data-i18n="emptyChat"></div>
+            </div>
+            <div class="attach-preview" id="attachPreview" hidden>
+              <img id="attachImg" alt="">
+              <span data-i18n="attached"></span>
+              <button class="btn-ghost btn-sm" id="btnDetach" type="button" data-i18n="remove"></button>
+            </div>
+            <div class="composer">
+              <input type="file" id="fileInput" accept="image/*" hidden />
+              <button class="btn-ghost btn-icon" id="btnAttach" type="button" aria-label="Attach image"><i data-lucide="paperclip" class="ic" aria-hidden="true"></i></button>
+              <textarea class="input" id="msgInput" rows="1" data-i18n-placeholder="placeholder"></textarea>
+              <button class="btn-ghost btn-icon" id="btnRepeat" type="button" aria-label="Send three times"><span style="font-family:var(--font-mono);font-weight:500">×3</span></button>
+              <button class="edu-btn btn-icon" id="btnSend" type="button" disabled aria-label="Send"><i data-lucide="send" class="ic" aria-hidden="true"></i></button>
+              <button class="edu-btn btn-icon btn-danger" id="btnStop" type="button" hidden aria-label="Stop"><i data-lucide="square" class="ic" aria-hidden="true"></i></button>
+            </div>
+            <div class="card-foot">
+              <span data-i18n-html="shortcuts"></span>
+              <span class="edu-caption" data-i18n="localNote"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Experiments ─── -->
+    <section class="sec" id="sec-exp">
+      <div class="wrap">
+        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secExp"></h2></div>
+        <p class="edu-body-lg" style="margin:0 0 24px" data-i18n="expLead"></p>
+        <div class="tiles" id="tiles"></div>
+      </div>
+    </section>
+
+    <!-- ─── Glossary ─── -->
+    <section class="sec" id="sec-gloss">
+      <div class="wrap">
+        <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h2 data-i18n="secGloss"></h2></div>
+        <div class="card table-card">
+          <div class="card-head"><span class="tile-h"><span class="badge tone-blue"><i data-lucide="list-filter" class="ic" aria-hidden="true"></i></span><h3 data-i18n="glossTitle"></h3></span></div>
+          <div class="card-body">
+            <table>
+              <thead><tr><th data-i18n="thParam"></th><th data-i18n="thWhere"></th><th data-i18n="thWhat"></th><th data-i18n="thTry"></th></tr></thead>
+              <tbody id="glossBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <span data-i18n="footer"></span>
+      <span><a href="https://huggingface.co/onnx-community/Qwen3.5-0.8B-ONNX-OPT" target="_blank" rel="noopener">onnx-community/Qwen3.5-0.8B-ONNX-OPT</a> · <a href="https://github.com/workszop/qwen" target="_blank" rel="noopener">GitHub</a></span>
     </div>
-    
-    <div id="chatMessages" class="chat-messages"></div>
-    
-    <div class="chat-bottom-container">
-      <div class="chat-settings">
-        <label title="Higher = more creative/random. 0 = deterministic.">
-          Temp: 
-          <input type="range" id="tempInput" min="0" max="3.0" step="0.1" value="1.0" />
-          <span id="tempDisplay">1.0</span>
-        </label>
-        <label title="Maximum number of words/tokens to generate.">
-          Max Tokens: 
-          <input type="number" id="tokenInput" min="1" max="2048" value="128" />
-        </label>
-        <button id="btnClearChat" title="Clear visual chat history">Clear Chat</button>
-      </div>
+  </footer>
 
-      <div class="chat-input-area">
-        <input type="file" id="fileInput" accept="image/*" hidden />
-        <button id="btnAttach" title="Attach Image">📎</button>
-        <textarea id="msgInput" placeholder="Type a message or describe an image..." rows="1"></textarea>
-        <button id="btnSend" disabled>Send</button>
-      </div>
-      
-      <div class="disclaimer">
-        Educational Demo: To save memory, this chat does not use conversation history. Every message is treated as a completely new prompt.
-      </div>
-    </div>
-  </div>
+  <div class="sr-only" id="live" aria-live="polite" role="status"></div>
 
   <script type="module">
     import {
       AutoProcessor,
       Qwen3_5ForConditionalGeneration,
       RawImage,
-      TextStreamer
-    } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.0.0-next.6";
+      TextStreamer,
+      InterruptableStoppingCriteria,
+    } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1";
 
-    let processor = null;
-    let model = null;
-    let attachedImage = null; 
-    let messageHistory = [];
-    const modelId = "onnx-community/Qwen3.5-0.8B-ONNX"; 
+    // ─── Constants ───
+    const MODEL_ID = "onnx-community/Qwen3.5-0.8B-ONNX-OPT";
+    const DTYPE = { embed_tokens: "q4", vision_encoder: "fp16", decoder_model_merged: "q4" };
+    const LANG_KEY = "qwen.lang";
+    const IMAGE_SIZE = 448;
+    const FONT_WAIT_MS = 1500;
+    const BRAND_FONTS = ['400 1em Outfit', '700 1em Outfit', '400 1em "IBM Plex Sans"', '600 1em "IBM Plex Sans"', '400 1em "Roboto Mono"'];
 
+    const DEFAULTS = {
+      sys: { pl: "Jesteś pomocnym asystentem. Odpowiadaj krótko.", en: "You are a helpful assistant. Answer briefly." },
+      memory: 0, thinking: 0, sample: 1,
+      temp: 0.7, topk: 20, topp: 0.95, rep: 1.0, ngram: 0, maxTok: 200, minTok: 0,
+    };
+
+    const T = {
+      pl: {
+        title: "Mały model językowy w Twojej przeglądarce",
+        lead: "Qwen3.5 0.8B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. Zmieniaj parametry generowania i obserwuj, jak zmienia się odpowiedź. To samo pytanie, inne ustawienia, inny wynik.",
+        secModel: "Model", secBench: "Warsztat", secExp: "Eksperymenty", secGloss: "Słownik parametrów",
+        stateIdle: "nie załadowany", stateLoading: "pobieranie", stateCompiling: "kompilacja", stateReady: "gotowy", stateError: "błąd",
+        fParams: "Parametry", fDownload: "Pobieranie (raz)", fRuntime: "Silnik", fLangs: "Języki", fLangsV: "201, w tym polski",
+        load: "Załaduj model do przeglądarki", loadNote: "Pliki trafiają do pamięci podręcznej przeglądarki. Drugie uruchomienie jest szybkie.",
+        noGpu: "Ta przeglądarka nie udostępnia WebGPU. Użyj aktualnego Chrome lub Edge na komputerze z kartą graficzną.",
+        whyTitle: "Co się dzieje", why1: "Wysłanych zapytań do serwera", why2: "Obliczeń na Twoim sprzęcie", why3: "Tokenów na sekundę (ostatnia odpowiedź)",
+        params: "Parametry", reset: "Domyślne",
+        gPrompt: "Prompt i kontekst", sysPrompt: "Prompt systemowy",
+        sysHint: "Instrukcja, którą model widzi przed Twoją wiadomością. Nadaje rolę, język i styl.",
+        memory: "Pamięć rozmowy", memoryHint: "Wyłączona: każda wiadomość to nowy start. Włączona: model widzi poprzednie tury, a prompt rośnie.",
+        thinking: "Tryb myślenia", thinkingHint: "Model najpierw pisze rozumowanie w bloku <think>, potem odpowiedź. Wolniej, ale często trafniej.",
+        on: "wł.", off: "wył.",
+        gSampling: "Losowość", decoding: "Dekodowanie", greedy: "zachłanne", sampling: "losowanie",
+        decodingHint: "Zachłanne: zawsze najbardziej prawdopodobny token, ta sama odpowiedź za każdym razem. Losowanie: token wybierany z rozkładu.",
+        temperature: "Temperatura", tempHint: "Spłaszcza (wyżej) lub wyostrza (niżej) rozkład prawdopodobieństw. 0.1 niemal deterministycznie, 2.0 chaos.",
+        topkHint: "Losuj tylko spośród k najbardziej prawdopodobnych tokenów. 0 = bez ograniczenia, 1 = jak zachłanne.",
+        toppHint: "Losuj spośród najmniejszego zbioru tokenów o łącznym prawdopodobieństwie p. 1.0 = wyłączone.",
+        gRepeat: "Powtórzenia", repPenalty: "Kara za powtórzenia", repHint: "Obniża prawdopodobieństwo tokenów, które już wystąpiły. 1.0 = brak kary, powyżej 1.3 model zaczyna unikać zwykłych słów.",
+        noRepeat: "Blokada n-gramów", noRepeatHint: "Zakazuje powtórzenia jakiejkolwiek sekwencji n tokenów. 0 = wyłączone. Przy 2 model nie powtórzy nawet nazwiska.",
+        gLength: "Długość", maxTokens: "Maks. tokenów", maxHint: "Twardy limit długości odpowiedzi. Model może skończyć wcześniej, jeśli sam wygeneruje znak końca.",
+        minTokens: "Min. tokenów", minHint: "Blokuje znak końca, aż powstanie tyle tokenów. Zmusza model do mówienia dalej.",
+        chat: "Czat", chatIdle: "czeka na model", chatReady: "gotowy", chatGen: "generuje", clear: "Wyczyść",
+        emptyChat: "Załaduj model, a potem wpisz wiadomość albo wybierz eksperyment poniżej.",
+        attached: "Obraz dołączony do następnej wiadomości", remove: "Usuń",
+        placeholder: "Napisz wiadomość…",
+        shortcuts: "<span class='kbd'>Enter</span> wyślij · <span class='kbd'>Shift+Enter</span> nowa linia · <span class='kbd'>Esc</span> stop · <span class='kbd'>×3</span> ta sama wiadomość trzy razy",
+        localNote: "Nic nie wychodzi z Twojego komputera.",
+        describeImage: "Opisz ten obraz.",
+        thinkLabel: "rozumowanie", stopped: "przerwano",
+        mTokens: "tok.", mTps: "tok./s", mTime: "s",
+        expLead: "Każda karta ustawia parametry i wpisuje pytanie. Kliknij „Ustaw”, a potem wyślij – najlepiej kilka razy, żeby zobaczyć rozrzut.",
+        apply: "Ustaw", applied: "Ustawiono – wyślij wiadomość",
+        glossTitle: "Co możesz kontrolować", thParam: "Parametr", thWhere: "Gdzie działa", thWhat: "Co robi", thTry: "Spróbuj",
+        footer: "edulab · materiał edukacyjny · model: Qwen3.5 0.8B (Apache 2.0), silnik: Transformers.js",
+        errLoad: "Nie udało się załadować modelu: ",
+        liveLoaded: "Model załadowany. Możesz pisać.", liveDone: "Odpowiedź gotowa.",
+      },
+      en: {
+        title: "A small language model in your browser",
+        lead: "Qwen3.5 0.8B runs locally on your graphics card – no server, no API. Change the generation parameters and watch the answer change. Same question, different settings, different result.",
+        secModel: "Model", secBench: "Workbench", secExp: "Experiments", secGloss: "Parameter glossary",
+        stateIdle: "not loaded", stateLoading: "downloading", stateCompiling: "compiling", stateReady: "ready", stateError: "error",
+        fParams: "Parameters", fDownload: "Download (once)", fRuntime: "Runtime", fLangs: "Languages", fLangsV: "201, Polish included",
+        load: "Load the model into the browser", loadNote: "Files go to the browser cache. The second start is fast.",
+        noGpu: "This browser does not expose WebGPU. Use a current Chrome or Edge on a computer with a graphics card.",
+        whyTitle: "What is happening", why1: "Requests sent to a server", why2: "Compute on your own hardware", why3: "Tokens per second (last answer)",
+        params: "Parameters", reset: "Defaults",
+        gPrompt: "Prompt and context", sysPrompt: "System prompt",
+        sysHint: "The instruction the model sees before your message. It sets role, language and style.",
+        memory: "Conversation memory", memoryHint: "Off: every message is a fresh start. On: the model sees previous turns and the prompt grows.",
+        thinking: "Thinking mode", thinkingHint: "The model first writes its reasoning in a <think> block, then the answer. Slower, often more accurate.",
+        on: "on", off: "off",
+        gSampling: "Randomness", decoding: "Decoding", greedy: "greedy", sampling: "sampling",
+        decodingHint: "Greedy: always the most likely token, the same answer every time. Sampling: the token is drawn from the distribution.",
+        temperature: "Temperature", tempHint: "Flattens (higher) or sharpens (lower) the probability distribution. 0.1 is almost deterministic, 2.0 is chaos.",
+        topkHint: "Sample only among the k most likely tokens. 0 = no limit, 1 = same as greedy.",
+        toppHint: "Sample from the smallest set of tokens whose probabilities add up to p. 1.0 = off.",
+        gRepeat: "Repetition", repPenalty: "Repetition penalty", repHint: "Lowers the probability of tokens that already appeared. 1.0 = no penalty, above 1.3 the model starts avoiding ordinary words.",
+        noRepeat: "No-repeat n-gram", noRepeatHint: "Forbids repeating any sequence of n tokens. 0 = off. At 2 the model cannot even repeat a surname.",
+        gLength: "Length", maxTokens: "Max tokens", maxHint: "Hard limit on answer length. The model may stop earlier if it emits an end token itself.",
+        minTokens: "Min tokens", minHint: "Blocks the end token until this many tokens exist. Forces the model to keep talking.",
+        chat: "Chat", chatIdle: "waiting for model", chatReady: "ready", chatGen: "generating", clear: "Clear",
+        emptyChat: "Load the model, then type a message or pick an experiment below.",
+        attached: "Image attached to the next message", remove: "Remove",
+        placeholder: "Type a message…",
+        shortcuts: "<span class='kbd'>Enter</span> send · <span class='kbd'>Shift+Enter</span> new line · <span class='kbd'>Esc</span> stop · <span class='kbd'>×3</span> same message three times",
+        localNote: "Nothing leaves your computer.",
+        describeImage: "Describe this image.",
+        thinkLabel: "reasoning", stopped: "stopped",
+        mTokens: "tok", mTps: "tok/s", mTime: "s",
+        expLead: "Each card sets the parameters and fills in a question. Click “Set”, then send – ideally several times, to see the spread.",
+        apply: "Set", applied: "Set – now send the message",
+        glossTitle: "What you can control", thParam: "Parameter", thWhere: "Where it acts", thWhat: "What it does", thTry: "Try",
+        footer: "edulab · educational material · model: Qwen3.5 0.8B (Apache 2.0), runtime: Transformers.js",
+        errLoad: "Could not load the model: ",
+        liveLoaded: "Model loaded. You can type.", liveDone: "Answer ready.",
+      },
+    };
+
+    // Experiments: each sets parameters + a prompt. Texts per language.
+    const EXPERIMENTS = [
+      { id: "temp", tone: "yellow", icon: "thermometer",
+        set: { sample: 1, temp: 1.8, topk: 0, topp: 1, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
+        pl: { title: "Temperatura 1.8", body: "Bez top-k i top-p model losuje z całego rozkładu. Wyślij trzy razy (×3) i porównaj. Potem ustaw 0.3 i wyślij znów.", prompt: "Dokończ zdanie jednym krótkim zdaniem: Kot wszedł do kuchni i" },
+        en: { title: "Temperature 1.8", body: "Without top-k and top-p the model samples from the whole distribution. Send three times (×3) and compare. Then set 0.3 and send again.", prompt: "Finish with one short sentence: The cat walked into the kitchen and" } },
+      { id: "greedy", tone: "ink", icon: "hash",
+        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
+        pl: { title: "Zachłanne dekodowanie", body: "Zero losowości. Wyślij to samo pytanie trzy razy: odpowiedzi będą identyczne. To jest „temperatura 0” w API.", prompt: "Podaj trzy nazwy owoców." },
+        en: { title: "Greedy decoding", body: "No randomness. Send the same question three times: the answers will be identical. This is “temperature 0” in an API.", prompt: "Name three fruits." } },
+      { id: "topk1", tone: "blue", icon: "list-filter",
+        set: { sample: 1, temp: 2, topk: 1, topp: 1, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 0 },
+        pl: { title: "Top-k = 1 przy temperaturze 2", body: "Temperatura jest wysoka, ale top-k zostawia tylko jeden kandydat. Wynik: brak losowości. Pokazuje, że top-k działa po temperaturze.", prompt: "Jaka jest stolica Francji?" },
+        en: { title: "Top-k = 1 at temperature 2", body: "Temperature is high, but top-k leaves a single candidate. Result: no randomness. It shows that top-k acts after temperature.", prompt: "What is the capital of France?" } },
+      { id: "persona", tone: "grape", icon: "message-square",
+        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 160, thinking: 0, memory: 0,
+          sys: { pl: "Jesteś piratem z XVII wieku. Odpowiadasz wyłącznie po polsku, w stylu pirackim, maksymalnie dwa zdania.", en: "You are a 17th-century pirate. Answer only in pirate style, two sentences at most." } },
+        pl: { title: "Prompt systemowy", body: "Ta sama wiadomość, inna instrukcja systemowa. Zmień rolę w polu „Prompt systemowy” i wyślij ponownie.", prompt: "Jak działa fotosynteza?" },
+        en: { title: "System prompt", body: "Same message, different system instruction. Change the role in the “System prompt” field and send again.", prompt: "How does photosynthesis work?" } },
+      { id: "lang", tone: "green", icon: "languages",
+        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 160, thinking: 0, memory: 0,
+          sys: { pl: "You are a helpful assistant. Answer in the language of the question.", en: "You are a helpful assistant. Answer in the language of the question." } },
+        pl: { title: "Polski kontra angielski", body: "Mały model ma mniej danych po polsku. Prompt systemowy jest po angielsku, żeby nie narzucać języka. Wyślij po polsku, potem to samo po angielsku i porównaj.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." },
+        en: { title: "Polish versus English", body: "A small model has seen less Polish data. The system prompt is in English so it does not force a language. Send in Polish, then the same in English, and compare.", prompt: "Wyjaśnij w dwóch zdaniach, czym jest inflacja." } },
+      { id: "repeat", tone: "red", icon: "repeat",
+        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1.8, ngram: 2, maxTok: 160, thinking: 0, memory: 0 },
+        pl: { title: "Przesadna kara za powtórzenia", body: "Kara 1.8 i blokada 2-gramów. Model nie może powtórzyć nawet „i”. Zobacz, jak zaczyna kaleczyć język. Potem wróć do 1.0 i 0.", prompt: "Wymień dni tygodnia." },
+        en: { title: "Excessive repetition penalty", body: "Penalty 1.8 and a 2-gram block. The model cannot even repeat “the”. Watch the language break. Then go back to 1.0 and 0.", prompt: "List the days of the week." } },
+      { id: "think", tone: "blue", icon: "brain",
+        set: { sample: 1, temp: 0.6, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 1200, thinking: 1, memory: 0 },
+        pl: { title: "Tryb myślenia", body: "Model najpierw rozumuje w bloku <think>, potem odpowiada. Rozumowanie bywa długie: jeśli zużyje cały limit tokenów, zwiększ go. Porównaj z trybem wyłączonym.", prompt: "Mam 3 jabłka, zjadłem jedno i kupiłem 5 gruszek. Ile mam owoców?" },
+        en: { title: "Thinking mode", body: "The model reasons in a <think> block first, then answers. Reasoning can be long: if it eats the whole token budget, raise it. Compare with thinking off.", prompt: "I had 3 apples, ate one and bought 5 pears. How many pieces of fruit do I have?" } },
+      { id: "memory", tone: "grape", icon: "timer",
+        set: { sample: 0, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 120, thinking: 0, memory: 1 },
+        pl: { title: "Pamięć rozmowy", body: "Pamięć włączona. Wyślij tę wiadomość, potem zapytaj „Jak się nazywam?”. Następnie wyłącz pamięć i zadaj to pytanie jeszcze raz.", prompt: "Nazywam się Ania i mieszkam w Gdańsku." },
+        en: { title: "Conversation memory", body: "Memory on. Send this, then ask “What is my name?”. Then switch memory off and ask the same question again.", prompt: "My name is Anna and I live in Gdańsk." } },
+      { id: "min", tone: "yellow", icon: "ruler",
+        set: { sample: 1, temp: 0.7, topk: 20, topp: 0.95, rep: 1, ngram: 0, maxTok: 200, minTok: 120, thinking: 0, memory: 0 },
+        pl: { title: "Min. 120 tokenów", body: "Pytanie ma odpowiedź jednym słowem, ale model nie może skończyć przed 120 tokenami. Zobacz, co dopisze.", prompt: "Odpowiedz jednym słowem: jaki kolor ma niebo?" },
+        en: { title: "Min 120 tokens", body: "The question has a one-word answer, but the model may not stop before 120 tokens. See what it adds.", prompt: "Answer with one word: what colour is the sky?" } },
+    ];
+
+    const GLOSSARY = {
+      pl: [
+        ["Prompt systemowy", "wejście", "Instrukcja przed rozmową: rola, język, styl, ograniczenia.", "Każ odpowiadać wyłącznie po angielsku i wyślij pytanie po polsku."],
+        ["Pamięć rozmowy", "wejście", "Czy poprzednie tury trafiają do promptu. Dłuższy prompt = wolniej.", "Przedstaw się, potem zapytaj o swoje imię z pamięcią i bez."],
+        ["Tryb myślenia", "szablon", "Flaga enable_thinking w szablonie czatu: model pisze rozumowanie przed odpowiedzią.", "Zadanie arytmetyczne z myśleniem i bez."],
+        ["Dekodowanie", "wybór tokena", "Zachłanne = argmax. Losowanie = próbkowanie z rozkładu po temperaturze, top-k i top-p.", "To samo pytanie ×3 w obu trybach."],
+        ["Temperatura", "logity", "Dzieli logity przez T przed softmaxem. Wysoka spłaszcza, niska wyostrza.", "0.3 kontra 1.8 na kreatywnym zadaniu."],
+        ["Top-k", "filtr", "Zostawia k najbardziej prawdopodobnych tokenów, resztę zeruje.", "k = 1 przy wysokiej temperaturze."],
+        ["Top-p (nucleus)", "filtr", "Zostawia najmniejszy zbiór o łącznym prawdopodobieństwie p.", "0.5 kontra 1.0 na tym samym pytaniu."],
+        ["Kara za powtórzenia", "logity", "Mnoży logity już użytych tokenów (dzieli, gdy dodatnie), by zniechęcić do powtórek.", "1.0 kontra 1.8 przy wyliczance."],
+        ["Blokada n-gramów", "filtr", "Zeruje tokeny, które utworzyłyby powtórzony n-gram.", "n = 2 i poproś o listę z powtarzającym się słowem."],
+        ["Maks. tokenów", "stop", "Twardy limit długości.", "20 tokenów i poproś o esej."],
+        ["Min. tokenów", "stop", "Blokuje token końca do osiągnięcia limitu.", "120 tokenów i pytanie na jedno słowo."],
+        ["Obraz", "wejście", "Model jest wielomodalny: obraz zamienia się na tokeny wizyjne (448×448).", "Dołącz zdjęcie i poproś o opis po polsku."],
+        ["Ziarno losowości (seed)", "–", "Niedostępne w tej bibliotece: losowanie korzysta z Math.random, więc wyników z losowaniem nie da się odtworzyć.", "Użyj dekodowania zachłannego, gdy potrzebujesz powtarzalności."],
+      ],
+      en: [
+        ["System prompt", "input", "Instruction before the conversation: role, language, style, limits.", "Order English-only answers and send a Polish question."],
+        ["Conversation memory", "input", "Whether previous turns go into the prompt. Longer prompt = slower.", "Introduce yourself, then ask for your name with and without memory."],
+        ["Thinking mode", "template", "The enable_thinking flag in the chat template: the model writes reasoning before the answer.", "An arithmetic task with and without thinking."],
+        ["Decoding", "token choice", "Greedy = argmax. Sampling = draw from the distribution after temperature, top-k and top-p.", "Same question ×3 in both modes."],
+        ["Temperature", "logits", "Divides logits by T before softmax. High flattens, low sharpens.", "0.3 versus 1.8 on a creative task."],
+        ["Top-k", "filter", "Keeps the k most likely tokens, zeroes the rest.", "k = 1 at a high temperature."],
+        ["Top-p (nucleus)", "filter", "Keeps the smallest set whose probabilities add up to p.", "0.5 versus 1.0 on the same question."],
+        ["Repetition penalty", "logits", "Scales logits of tokens already used to discourage repeats.", "1.0 versus 1.8 on a list."],
+        ["No-repeat n-gram", "filter", "Zeroes tokens that would complete a repeated n-gram.", "n = 2 and ask for a list with a recurring word."],
+        ["Max tokens", "stop", "Hard length limit.", "20 tokens and ask for an essay."],
+        ["Min tokens", "stop", "Blocks the end token until the limit is reached.", "120 tokens and a one-word question."],
+        ["Image", "input", "The model is multimodal: an image becomes vision tokens (448×448).", "Attach a photo and ask for a description in Polish."],
+        ["Random seed", "–", "Not available in this library: sampling uses Math.random, so sampled results cannot be reproduced.", "Use greedy decoding when you need repeatability."],
+      ],
+    };
+
+    // ─── State ───
+    const S = {
+      lang: "pl",
+      status: "idle",          // idle | loading | ready | generating
+      processor: null, model: null,
+      history: [],             // chat turns when memory is on
+      attached: null,          // { raw, dataURL }
+      stopper: null,
+      params: { ...DEFAULTS, sys: DEFAULTS.sys.pl },
+      progress: {},            // file -> { loaded, total }
+    };
+
+    // ─── DOM refs ───
     const $ = (id) => document.getElementById(id);
-    const showScreen = (id) => document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+    const el = {
+      body: document.body, live: $("live"),
+      modelChip: $("modelChip"), btnLoad: $("btnLoad"), progressWrap: $("progressWrap"), progressBar: $("progressBar"),
+      progressFile: $("progressFile"), progressPct: $("progressPct"), gpuWarn: $("gpuWarn"), loadError: $("loadError"), loadErrorText: $("loadErrorText"),
+      statTps: $("statTps"),
+      sysInput: $("sysInput"), tempInput: $("tempInput"), topkInput: $("topkInput"), toppInput: $("toppInput"), repInput: $("repInput"), ngramInput: $("ngramInput"),
+      maxTok: $("maxTok"), minTok: $("minTok"), btnReset: $("btnReset"),
+      chatState: $("chatState"), messages: $("messages"), emptyMsg: $("emptyMsg"), msgInput: $("msgInput"),
+      btnSend: $("btnSend"), btnStop: $("btnStop"), btnRepeat: $("btnRepeat"), btnClear: $("btnClear"), btnAttach: $("btnAttach"), btnDetach: $("btnDetach"),
+      fileInput: $("fileInput"), attachPreview: $("attachPreview"), attachImg: $("attachImg"),
+      tiles: $("tiles"), glossBody: $("glossBody"),
+    };
 
-    // Update Slider Display
-    $("tempInput").addEventListener("input", (e) => {
-      $("tempDisplay").textContent = parseFloat(e.target.value).toFixed(1);
-    });
+    // ─── Helpers ───
+    const t = (key) => T[S.lang][key] ?? T.pl[key] ?? key;
+    const fmtMB = (b) => (b / 1e6).toFixed(0) + " MB";
+    const announce = (text) => { el.live.textContent = ""; setTimeout(() => { el.live.textContent = text; }, 30); };
+    const icons = () => { if (window.lucide) lucide.createIcons(); };
+    const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-    // Clear Chat Logic
-    $("btnClearChat").addEventListener("click", () => {
-      $("chatMessages").innerHTML = "";
-      attachedImage = null;
-      $("fileInput").value = "";
-      $("msgInput").value = "";
-      $("btnSend").disabled = true;
-    });
+    function setStatus(status) {
+      S.status = status;
+      el.body.dataset.state = status;
+      const chipKey = { idle: "stateIdle", loading: "stateLoading", compiling: "stateCompiling", ready: "stateReady", generating: "stateReady", error: "stateError" }[status];
+      el.modelChip.textContent = t(chipKey);
+      el.modelChip.className = "edu-chip " + ({ ready: "tone-green", generating: "tone-green", error: "tone-red", idle: "tone-stone" }[status] || "tone-yellow");
+      const chatKey = status === "generating" ? "chatGen" : (status === "ready" ? "chatReady" : "chatIdle");
+      el.chatState.textContent = t(chatKey);
+      el.chatState.className = "edu-chip " + (status === "generating" ? "tone-yellow" : status === "ready" ? "tone-green" : "tone-stone");
+      const ready = status === "ready";
+      el.btnLoad.disabled = status === "loading" || status === "compiling" || ready || status === "generating";
+      el.btnSend.hidden = status === "generating";
+      el.btnStop.hidden = status !== "generating";
+      el.btnRepeat.disabled = !ready;
+      el.btnAttach.disabled = !ready;
+      el.msgInput.disabled = !(ready || status === "generating");
+      updateSendState();
+    }
 
-    $("btnLoad").addEventListener("click", async () => {
-      if (!navigator.gpu) return alert("WebGPU is required.");
-      showScreen("loading");
+    function updateSendState() {
+      const hasText = el.msgInput.value.trim() !== "";
+      el.btnSend.disabled = !(S.status === "ready" && (hasText || S.attached));
+    }
 
-      try {
-        $("loaderText").textContent = "Loading processor...";
-        processor = await AutoProcessor.from_pretrained(modelId);
-        
-        $("loaderText").textContent = "Loading model weights into GPU...";
-        model = await Qwen3_5ForConditionalGeneration.from_pretrained(modelId, {
-          dtype: { embed_tokens: "q4", vision_encoder: "q8", decoder_model_merged: "q4" },
-          device: "webgpu",
-        });
+    function readParams() {
+      const p = S.params;
+      p.sys = el.sysInput.value;
+      p.temp = parseFloat(el.tempInput.value);
+      p.topk = parseInt(el.topkInput.value, 10);
+      p.topp = parseFloat(el.toppInput.value);
+      p.rep = parseFloat(el.repInput.value);
+      p.ngram = parseInt(el.ngramInput.value, 10);
+      p.maxTok = Math.max(1, parseInt(el.maxTok.value, 10) || 1);
+      p.minTok = Math.max(0, parseInt(el.minTok.value, 10) || 0);
+      return p;
+    }
 
-        $("loaderText").textContent = "Compiling WebGPU shaders...";
-        const warmupPrompt = processor.apply_chat_template([{ role: "user", content: [{ type: "text", text: "Hi" }] }], { add_generation_prompt: true });
-        const warmupInputs = await processor(warmupPrompt);
-        await model.generate({ ...warmupInputs, max_new_tokens: 1 });
-        
-        showScreen("chat");
-      } catch (err) {
-        alert("Failed to load: " + err.message);
-        showScreen("landing");
+    function writeParams() {
+      const p = S.params;
+      el.sysInput.value = p.sys;
+      el.tempInput.value = p.temp; el.topkInput.value = p.topk; el.toppInput.value = p.topp;
+      el.repInput.value = p.rep; el.ngramInput.value = p.ngram; el.maxTok.value = p.maxTok; el.minTok.value = p.minTok;
+      for (const name of ["memory", "thinking", "sample"]) {
+        document.querySelectorAll(`[data-sw="${name}"]`).forEach((b) => b.classList.toggle("active", Number(b.dataset.val) === Number(p[name])));
       }
-    });
+      renderParamValues();
+      el.body.dataset.params = JSON.stringify({ sample: p.sample, temp: p.temp, topk: p.topk, topp: p.topp, rep: p.rep, ngram: p.ngram, maxTok: p.maxTok, minTok: p.minTok, thinking: p.thinking, memory: p.memory });
+    }
 
-    $("btnAttach").addEventListener("click", () => $("fileInput").click());
-    
-    $("fileInput").addEventListener("change", async (e) => {
+    function renderParamValues() {
+      $("tempVal").textContent = parseFloat(el.tempInput.value).toFixed(1);
+      $("topkVal").textContent = el.topkInput.value === "0" ? "off" : el.topkInput.value;
+      $("toppVal").textContent = el.toppInput.value === "1" ? "off" : parseFloat(el.toppInput.value).toFixed(2);
+      $("repVal").textContent = parseFloat(el.repInput.value).toFixed(2);
+      $("ngramVal").textContent = el.ngramInput.value === "0" ? "off" : el.ngramInput.value;
+      const sampling = Number(S.params.sample) === 1;
+      document.querySelectorAll("[data-needs-sample]").forEach((f) => {
+        f.classList.toggle("disabled-note", !sampling);
+        f.querySelectorAll("input").forEach((i) => { i.disabled = !sampling; });
+      });
+    }
+
+    function buildGenerationOptions(p) {
+      const sampling = Number(p.sample) === 1;
+      const opts = { max_new_tokens: p.maxTok, do_sample: sampling };
+      if (p.minTok > 0) opts.min_new_tokens = p.minTok;
+      if (sampling) {
+        opts.temperature = p.temp;
+        opts.top_k = p.topk > 0 ? p.topk : 0;
+        if (p.topp < 1) opts.top_p = p.topp;
+      }
+      if (p.rep !== 1) opts.repetition_penalty = p.rep;
+      if (p.ngram > 0) opts.no_repeat_ngram_size = p.ngram;
+      return opts;
+    }
+
+    function splitThinking(text) {
+      const idx = text.indexOf("</think>");
+      if (idx === -1) return { think: text, answer: "", open: true };
+      return { think: text.slice(0, idx).replace(/^<think>\s*/, "").trim(), answer: text.slice(idx + 8).replace(/^\s+/, ""), open: false };
+    }
+
+    function renderAssistant(node, fullText, thinking, done) {
+      const body = node.querySelector(".body");
+      const thinkEl = node.querySelector(".think");
+      if (thinking) {
+        const { think, answer, open } = splitThinking(fullText);
+        thinkEl.hidden = false;
+        thinkEl.querySelector(".think-body").textContent = think;
+        if (open && !done) thinkEl.open = true;
+        if (!open) thinkEl.open = false;
+        body.textContent = answer;
+        body.classList.toggle("cursor", !done);
+      } else {
+        thinkEl.hidden = true;
+        body.textContent = fullText;
+        body.classList.toggle("cursor", !done);
+      }
+      el.messages.scrollTop = el.messages.scrollHeight;
+    }
+
+    // ─── Render ───
+    function applyI18n() {
+      document.documentElement.lang = S.lang;
+      el.body.dataset.lang = S.lang;
+      document.title = (S.lang === "pl" ? "Mały model w przeglądarce" : "A small model in the browser") + " · edulab";
+      document.querySelectorAll("[data-i18n]").forEach((n) => { n.textContent = t(n.dataset.i18n); });
+      document.querySelectorAll("[data-i18n-html]").forEach((n) => { n.innerHTML = t(n.dataset.i18nHtml); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((n) => { n.placeholder = t(n.dataset.i18nPlaceholder); });
+      document.querySelectorAll("[data-lang-btn]").forEach((b) => b.classList.toggle("active", b.dataset.langBtn === S.lang));
+      // Default system prompt follows the language until the user edits it.
+      const otherLang = S.lang === "pl" ? "en" : "pl";
+      if (S.params.sys === DEFAULTS.sys[otherLang] || S.params.sys === "") { S.params.sys = DEFAULTS.sys[S.lang]; el.sysInput.value = S.params.sys; }
+      setStatus(S.status);
+      renderTiles();
+      renderGlossary();
+      icons();
+    }
+
+    function renderTiles() {
+      el.tiles.innerHTML = EXPERIMENTS.map((x) => {
+        const c = x[S.lang];
+        const chips = Object.entries(x.set).filter(([k]) => !["sys"].includes(k)).map(([k, v]) => {
+          const label = { sample: v ? "sampling" : "greedy", temp: `T ${v}`, topk: `top-k ${v || "off"}`, topp: `top-p ${v === 1 ? "off" : v}`, rep: `rep ${v}`, ngram: `n-gram ${v || "off"}`, maxTok: `max ${v}`, minTok: `min ${v}`, thinking: v ? "think" : null, memory: v ? "memory" : null }[k];
+          return label ? `<span class="edu-chip">${label}</span>` : "";
+        }).join("");
+        return `<article class="card" data-exp="${x.id}">
+          <div class="card-head"><span class="tile-h"><span class="badge tone-${x.tone}"><i data-lucide="${x.icon}" class="ic" aria-hidden="true"></i></span><h3>${escapeHtml(c.title)}</h3></span></div>
+          <div class="card-body"><p>${escapeHtml(c.body)}</p><div class="settings">${chips}</div></div>
+          <div class="card-foot"><button class="edu-btn btn-sm" type="button" data-apply="${x.id}"><i data-lucide="flask-conical" class="ic" aria-hidden="true"></i><span>${t("apply")}</span></button><span class="edu-caption" data-applied hidden>${t("applied")}</span></div>
+        </article>`;
+      }).join("");
+    }
+
+    function renderGlossary() {
+      el.glossBody.innerHTML = GLOSSARY[S.lang].map((r) => `<tr><td>${escapeHtml(r[0])}</td><td class="mono">${escapeHtml(r[1])}</td><td>${escapeHtml(r[2])}</td><td>${escapeHtml(r[3])}</td></tr>`).join("");
+    }
+
+    function renderProgress() {
+      const files = Object.values(S.progress);
+      const loaded = files.reduce((a, f) => a + (f.loaded || 0), 0);
+      const total = files.reduce((a, f) => a + (f.total || 0), 0);
+      const pct = total ? Math.min(100, Math.round(loaded / total * 100)) : 0;
+      el.progressBar.querySelector("span").style.width = pct + "%";
+      el.progressBar.setAttribute("aria-valuenow", pct);
+      el.progressPct.textContent = pct + "%";
+      el.progressFile.textContent = total ? `${fmtMB(loaded)} / ${fmtMB(total)}` : "…";
+      el.body.dataset.progress = pct;
+    }
+
+    function addUserMessage(text, image) {
+      el.emptyMsg.hidden = true;
+      const node = document.createElement("div");
+      node.className = "msg user"; node.dataset.role = "user";
+      if (image) { const img = document.createElement("img"); img.src = image.dataURL; img.alt = ""; node.appendChild(img); }
+      node.appendChild(document.createTextNode(text));
+      el.messages.appendChild(node);
+      el.messages.scrollTop = el.messages.scrollHeight;
+    }
+
+    function addAssistantMessage() {
+      const node = document.createElement("div");
+      node.className = "msg assistant"; node.dataset.role = "assistant"; node.dataset.done = "0";
+      node.innerHTML = `<details class="think" hidden><summary><i data-lucide="brain" class="ic" aria-hidden="true"></i>${t("thinkLabel")}</summary><div class="think-body"></div></details><div class="body cursor"></div><div class="meta" hidden></div>`;
+      el.messages.appendChild(node);
+      icons();
+      el.messages.scrollTop = el.messages.scrollHeight;
+      return node;
+    }
+
+    function finishMessage(node, { tokens, seconds, stopped, error }) {
+      node.dataset.done = "1";
+      node.querySelector(".body").classList.remove("cursor");
+      const meta = node.querySelector(".meta");
+      meta.hidden = false;
+      const parts = [];
+      if (error) { node.classList.add("error"); node.querySelector(".body").textContent = error; }
+      if (tokens != null) parts.push(`${tokens} ${t("mTokens")}`);
+      if (seconds != null) parts.push(`${seconds.toFixed(1)} ${t("mTime")}`);
+      if (tokens != null && seconds > 0) { const tps = tokens / seconds; parts.push(`${tps.toFixed(1)} ${t("mTps")}`); el.statTps.textContent = tps.toFixed(1); node.dataset.tps = tps.toFixed(1); }
+      if (stopped) parts.push(t("stopped"));
+      const p = S.params;
+      parts.push(Number(p.sample) ? `T ${p.temp} · k ${p.topk || "off"} · p ${p.topp === 1 ? "off" : p.topp}` : "greedy");
+      if (p.rep !== 1) parts.push(`rep ${p.rep}`);
+      if (p.ngram) parts.push(`n-gram ${p.ngram}`);
+      if (Number(p.thinking)) parts.push("think");
+      if (Number(p.memory)) parts.push("memory");
+      meta.innerHTML = parts.map((x) => `<span>${escapeHtml(x)}</span>`).join("");
+      if (tokens != null) node.dataset.tokens = tokens;
+    }
+
+    // ─── Model loading ───
+    async function loadModel() {
+      if (!navigator.gpu) { el.gpuWarn.hidden = false; return; }
+      el.loadError.hidden = true;
+      el.progressWrap.hidden = false;
+      S.progress = {};
+      renderProgress();
+      setStatus("loading");
+      const progress_callback = (ev) => {
+        if (!ev || !ev.file) return;
+        if (ev.status === "initiate" || ev.status === "download") { S.progress[ev.file] = S.progress[ev.file] || { loaded: 0, total: 0 }; }
+        if (ev.status === "progress") { S.progress[ev.file] = { loaded: ev.loaded || 0, total: ev.total || 0 }; }
+        if (ev.status === "done") { const f = S.progress[ev.file]; if (f && f.total) f.loaded = f.total; }
+        renderProgress();
+      };
+      try {
+        S.processor = await AutoProcessor.from_pretrained(MODEL_ID, { progress_callback });
+        S.model = await Qwen3_5ForConditionalGeneration.from_pretrained(MODEL_ID, { dtype: DTYPE, device: "webgpu", progress_callback });
+        setStatus("compiling");
+        el.progressFile.textContent = t("stateCompiling");
+        const warm = S.processor.apply_chat_template([{ role: "user", content: [{ type: "text", text: "Hi" }] }], { add_generation_prompt: true, enable_thinking: false });
+        const warmInputs = await S.processor(warm);
+        await S.model.generate({ ...warmInputs, max_new_tokens: 1 });
+        el.progressWrap.hidden = true;
+        setStatus("ready");
+        announce(t("liveLoaded"));
+        el.msgInput.focus();
+      } catch (err) {
+        console.error(err);
+        el.loadErrorText.textContent = t("errLoad") + (err && err.message ? err.message : String(err));
+        el.loadError.hidden = false;
+        el.progressWrap.hidden = true;
+        setStatus("error");
+      }
+    }
+
+    // ─── Generation ───
+    async function send(text, image) {
+      if (S.status !== "ready") return;
+      const p = readParams();
+      const thinking = Number(p.thinking) === 1;
+      const memory = Number(p.memory) === 1;
+
+      addUserMessage(text, image);
+
+      const messages = [];
+      if (p.sys.trim()) messages.push({ role: "system", content: [{ type: "text", text: p.sys.trim() }] });
+      if (memory) messages.push(...S.history);
+      const content = [];
+      if (image) content.push({ type: "image" });
+      content.push({ type: "text", text });
+      messages.push({ role: "user", content });
+
+      const node = addAssistantMessage();
+      setStatus("generating");
+      S.stopper = new InterruptableStoppingCriteria();
+      const t0 = performance.now();
+      let full = "";
+      let stopped = false;
+      try {
+        const prompt = S.processor.apply_chat_template(messages, { add_generation_prompt: true, enable_thinking: thinking });
+        const inputs = image ? await S.processor(prompt, [image.raw]) : await S.processor(prompt);
+        const inputLen = inputs.input_ids.dims.at(-1);
+        const streamer = new TextStreamer(S.processor.tokenizer, {
+          skip_prompt: true, skip_special_tokens: true,
+          callback_function: (chunk) => { full += chunk; renderAssistant(node, full, thinking, false); },
+        });
+        const out = await S.model.generate({ ...inputs, ...buildGenerationOptions(p), streamer, stopping_criteria: S.stopper });
+        const newTokens = out.dims.at(-1) - inputLen;
+        stopped = S.stopper.interrupted === true;
+        renderAssistant(node, full, thinking, true);
+        finishMessage(node, { tokens: newTokens, seconds: (performance.now() - t0) / 1000, stopped });
+        const answer = thinking ? splitThinking(full).answer : full;
+        if (memory) {
+          S.history.push({ role: "user", content: [{ type: "text", text }] });
+          S.history.push({ role: "assistant", content: [{ type: "text", text: answer }] });
+        }
+        announce(t("liveDone"));
+      } catch (err) {
+        console.error(err);
+        finishMessage(node, { error: String(err && err.message || err), seconds: (performance.now() - t0) / 1000 });
+      } finally {
+        S.stopper = null;
+        setStatus("ready");
+      }
+    }
+
+    async function sendFromComposer(times = 1) {
+      const text = el.msgInput.value.trim();
+      const image = S.attached;
+      if (!text && !image) return;
+      el.msgInput.value = "";
+      detachImage();
+      updateSendState();
+      for (let i = 0; i < times; i++) {
+        if (S.status !== "ready") break;
+        await send(text, i === 0 ? image : null);
+      }
+      el.msgInput.focus();
+    }
+
+    function stop() { if (S.stopper) S.stopper.interrupt(); }
+
+    function clearChat() {
+      el.messages.querySelectorAll(".msg:not(.empty)").forEach((n) => n.remove());
+      el.emptyMsg.hidden = false;
+      S.history = [];
+      detachImage();
+    }
+
+    function detachImage() {
+      S.attached = null;
+      el.fileInput.value = "";
+      el.attachPreview.hidden = true;
+      updateSendState();
+    }
+
+    function applyExperiment(id) {
+      const x = EXPERIMENTS.find((e) => e.id === id);
+      if (!x) return;
+      const set = { ...x.set };
+      S.params = { ...S.params, ...set, sys: set.sys ? set.sys[S.lang] : DEFAULTS.sys[S.lang], minTok: set.minTok ?? 0 };
+      writeParams();
+      el.msgInput.value = x[S.lang].prompt;
+      updateSendState();
+      el.body.dataset.experiment = id;
+      document.querySelectorAll("[data-applied]").forEach((n) => { n.hidden = true; });
+      const note = el.tiles.querySelector(`[data-exp="${id}"] [data-applied]`);
+      if (note) note.hidden = false;
+      document.getElementById("sec-bench").scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => el.msgInput.focus({ preventScroll: true }), 400);
+    }
+
+    function resetParams() {
+      S.params = { ...DEFAULTS, sys: DEFAULTS.sys[S.lang] };
+      writeParams();
+      delete el.body.dataset.experiment;
+      document.querySelectorAll("[data-applied]").forEach((n) => { n.hidden = true; });
+    }
+
+    // ─── Listeners ───
+    document.querySelectorAll("[data-lang-btn]").forEach((b) => b.addEventListener("click", () => {
+      S.lang = b.dataset.langBtn;
+      try { localStorage.setItem(LANG_KEY, S.lang); } catch (_) {}
+      applyI18n();
+    }));
+
+    document.querySelectorAll("[data-sw]").forEach((b) => b.addEventListener("click", () => {
+      S.params[b.dataset.sw] = Number(b.dataset.val);
+      if (b.dataset.sw === "memory" && Number(b.dataset.val) === 0) S.history = [];
+      writeParams();
+    }));
+
+    for (const input of [el.tempInput, el.topkInput, el.toppInput, el.repInput, el.ngramInput, el.maxTok, el.minTok, el.sysInput]) {
+      input.addEventListener("input", () => { readParams(); writeParams(); });
+    }
+    el.btnReset.addEventListener("click", resetParams);
+    el.btnLoad.addEventListener("click", loadModel);
+    el.btnSend.addEventListener("click", () => sendFromComposer(1));
+    el.btnRepeat.addEventListener("click", () => sendFromComposer(3));
+    el.btnStop.addEventListener("click", stop);
+    el.btnClear.addEventListener("click", clearChat);
+    el.btnAttach.addEventListener("click", () => el.fileInput.click());
+    el.btnDetach.addEventListener("click", detachImage);
+    el.tiles.addEventListener("click", (e) => { const b = e.target.closest("[data-apply]"); if (b) applyExperiment(b.dataset.apply); });
+
+    el.fileInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const dataURL = URL.createObjectURL(file);
       const raw = await RawImage.read(dataURL);
-      const resized = await raw.resize(448, 448); 
-      attachedImage = { raw: resized, dataURL: dataURL };
-      $("msgInput").value = "Describe this image in detail."; 
-      $("btnSend").disabled = false;
+      S.attached = { raw: await raw.resize(IMAGE_SIZE, IMAGE_SIZE), dataURL };
+      el.attachImg.src = dataURL;
+      el.attachPreview.hidden = false;
+      if (!el.msgInput.value.trim()) el.msgInput.value = t("describeImage");
+      updateSendState();
     });
 
-    $("msgInput").addEventListener("input", () => {
-      $("btnSend").disabled = $("msgInput").value.trim() === "" && !attachedImage;
+    el.msgInput.addEventListener("input", () => {
+      updateSendState();
+      el.msgInput.style.height = "auto";
+      el.msgInput.style.height = Math.min(180, el.msgInput.scrollHeight) + "px";
+    });
+    el.msgInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!el.btnSend.disabled) sendFromComposer(1); }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && S.status === "generating") { e.preventDefault(); stop(); }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l" && S.status === "ready") { e.preventDefault(); clearChat(); }
     });
 
-    $("msgInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        if (!$("btnSend").disabled) $("btnSend").click();
-      }
-    });
+    // ─── Init ───
+    try { const saved = localStorage.getItem(LANG_KEY); if (saved === "pl" || saved === "en") S.lang = saved; } catch (_) {}
+    S.params.sys = DEFAULTS.sys[S.lang];
+    writeParams();
+    applyI18n();
+    if (!navigator.gpu) el.gpuWarn.hidden = false;
 
-    $("btnSend").addEventListener("click", async () => {
-      const text = $("msgInput").value.trim();
-      if (!text && !attachedImage) return;
-
-      $("btnSend").disabled = true;
-      $("msgInput").value = "";
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "msg user";
-      userMsg.innerHTML = attachedImage ? `<img src="${attachedImage.dataURL}"><span>${text}</span>` : text;
-      $("chatMessages").appendChild(userMsg);
-      $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
-
-      // Inject System Prompt
-      messageHistory = []; 
-      const sysText = $("sysInput").value.trim();
-      if (sysText) {
-        messageHistory.push({ role: "system", content: [{ type: "text", text: sysText }] });
-      }
-
-      // Add User Message
-      const content = [];
-      if (attachedImage) content.push({ type: "image" });
-      content.push({ type: "text", text: text });
-      messageHistory.push({ role: "user", content });
-
-      const aiMsg = document.createElement("div");
-      aiMsg.className = "msg assistant";
-      aiMsg.textContent = "Thinking...";
-      $("chatMessages").appendChild(aiMsg);
-
-      try {
-        const prompt = processor.apply_chat_template(messageHistory, { add_generation_prompt: true });
-        const inputs = attachedImage ? await processor(prompt, [attachedImage.raw]) : await processor(prompt);
-
-        let fullResponse = "";
-        aiMsg.textContent = ""; 
-
-        const tempValue = parseFloat($("tempInput").value);
-        const maxTokensValue = parseInt($("tokenInput").value, 10);
-        
-        await model.generate({
-          ...inputs,
-          max_new_tokens: maxTokensValue, 
-          do_sample: tempValue > 0, 
-          temperature: tempValue > 0 ? tempValue : undefined,
-          streamer: new TextStreamer(processor.tokenizer, {
-            skip_prompt: true,
-            skip_special_tokens: true,
-            callback_function: (token) => {
-              fullResponse += token;
-              aiMsg.textContent = fullResponse;
-              $("chatMessages").scrollTop = $("chatMessages").scrollHeight; 
-            }
-          })
-        });
-
-        messageHistory.push({ role: "assistant", content: [{ type: "text", text: fullResponse }] });
-      } catch (err) {
-        aiMsg.textContent = "Error: " + err.message;
-      } finally {
-        attachedImage = null; 
-        $("fileInput").value = "";
-        $("btnSend").disabled = false;
-      }
-    });
+    // ─── Reveal ───
+    Promise.race([
+      Promise.all(BRAND_FONTS.map((f) => document.fonts.load(f).catch(() => null))),
+      new Promise((r) => setTimeout(r, FONT_WAIT_MS)),
+    ]).then(() => document.documentElement.classList.add("app-ready"));
   </script>
 </body>
 </html>
