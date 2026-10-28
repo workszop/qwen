@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mały model w przeglądarce · edulab</title>
-  <meta name="description" content="Qwen3.5 0.8B running locally in the browser on WebGPU. An educational playground for temperature, top-k, top-p, repetition penalty, thinking mode, system prompts and non-English prompts." />
+  <meta name="description" content="Qwen3.5 0.8B or LFM3 1.7B running locally in the browser on WebGPU. An educational playground for temperature, top-k, top-p, repetition penalty, thinking mode, system prompts and non-English prompts." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,6 +205,7 @@
     .model-bar .card-head { flex-wrap: wrap; }
     .model-bar .card-body { padding: 14px 22px; }
     .model-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .model-pick button:disabled { opacity: .45; cursor: not-allowed; }
     .progress { height: 10px; border-radius: var(--r-pill); background: var(--paper-3); overflow: hidden; }
     .progress > span { display: block; height: 100%; width: 0; background: var(--yellow); border-radius: var(--r-pill); transition: width .25s ease; }
     .progress-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
@@ -357,9 +358,10 @@
     <!-- ─── Model bar ─── -->
     <section class="card model-bar" id="modelCard" aria-labelledby="modelTitle">
       <div class="card-head">
-        <span class="tile-h"><span class="badge tone-blue"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 id="modelTitle">Qwen3.5 · 0.8B · WebGPU</h3><span class="edu-chip tone-stone" id="modelChip" data-i18n="stateIdle"></span></span>
+        <span class="tile-h"><span class="badge tone-blue"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 id="modelTitle"></h3><span class="edu-chip tone-stone" id="modelChip" data-i18n="stateIdle"></span></span>
         <div class="model-actions">
-          <span class="edu-caption" id="modelNote" data-i18n="loadNote"></span>
+          <div class="switch model-pick" role="group" id="modelPick"></div>
+          <span class="edu-caption" id="modelNote"></span>
           <button class="edu-btn" id="btnLoad"><i data-lucide="download" class="ic" aria-hidden="true"></i><span data-i18n="load"></span></button>
         </div>
       </div>
@@ -533,7 +535,7 @@
   <footer class="site">
     <div class="wrap">
       <span data-i18n="footer"></span>
-      <span><a href="https://huggingface.co/onnx-community/Qwen3.5-0.8B-ONNX-OPT" target="_blank" rel="noopener">onnx-community/Qwen3.5-0.8B-ONNX-OPT</a> · <a href="https://github.com/workszop/qwen" target="_blank" rel="noopener">GitHub</a></span>
+      <span><a href="https://huggingface.co/onnx-community/Qwen3.5-0.8B-ONNX-OPT" target="_blank" rel="noopener">onnx-community/Qwen3.5-0.8B-ONNX-OPT</a> · <a href="https://huggingface.co/onnx-community/LFM3-1.7B-ONNX" target="_blank" rel="noopener">onnx-community/LFM3-1.7B-ONNX</a> · <a href="https://github.com/workszop/qwen" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </footer>
 
@@ -542,16 +544,29 @@
   <script type="module">
     import {
       AutoProcessor,
+      AutoTokenizer,
       Qwen3_5ForConditionalGeneration,
+      Lfm3ForCausalLM,
       RawImage,
       TextStreamer,
       InterruptableStoppingCriteria,
-    } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1";
+    } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2";
 
     // ─── Constants ───
-    const MODEL_ID = "onnx-community/Qwen3.5-0.8B-ONNX-OPT";
-    const DTYPE = { embed_tokens: "q4", vision_encoder: "fp16", decoder_model_merged: "q4" };
+    // vision: the model takes images (Qwen3.5 goes through AutoProcessor, text-only LFM3 through AutoTokenizer).
+    // LFM3: the onnx-community export (the LiquidAI one names its input logits_to_keep, which Transformers.js
+    // does not feed). q4 = 4-bit weights with fp32 activations; q4f16 overflows on WebGPU and answers off-topic.
+    const MODELS = {
+      qwen: { id: "onnx-community/Qwen3.5-0.8B-ONNX-OPT", name: "Qwen3.5", size: "0.8B", vision: true,
+        Model: Qwen3_5ForConditionalGeneration, dtype: { embed_tokens: "q4", vision_encoder: "fp16", decoder_model_merged: "q4" },
+        download: { pl: "850 MB", en: "850 MB" } },
+      lfm3: { id: "onnx-community/LFM3-1.7B-ONNX", name: "LFM3", size: "1.7B", vision: false,
+        Model: Lfm3ForCausalLM, dtype: "q4",
+        download: { pl: "1,3 GB", en: "1.3 GB" } },
+    };
+    const MODEL_DEFAULT = "qwen";
     const LANG_KEY = "qwen.lang";
+    const MODEL_KEY = "qwen.model";
     const IMAGE_SIZE = 448;
     const FONT_WAIT_MS = 1500;
     const BRAND_FONTS = ['400 1em Outfit', '700 1em Outfit', '400 1em "IBM Plex Sans"', '600 1em "IBM Plex Sans"', '400 1em "Roboto Mono"'];
@@ -563,10 +578,11 @@
     const T = {
       pl: {
         title: "Mały model językowy w Twojej przeglądarce",
-        lead: "Qwen3.5 0.8B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. To samo pytanie, dwa zestawy ustawień, dwie odpowiedzi obok siebie.",
+        lead: "Qwen3.5 0.8B albo LFM3 1.7B działa lokalnie na Twojej karcie graficznej – bez serwera i bez API. To samo pytanie, dwa zestawy ustawień, dwie odpowiedzi obok siebie.",
         navExp: "Eksperymenty", navSettings: "Ustawienia", navGloss: "Słownik", menu: "Menu",
         stateIdle: "nie załadowany", stateLoading: "pobieranie", stateCompiling: "kompilacja", stateReady: "gotowy", stateError: "błąd",
-        load: "Załaduj model", loadNote: "Pierwsze pobranie ok. 850 MB, potem z pamięci podręcznej.",
+        load: "Załaduj model", loadNote: "Pierwsze pobranie ok. {size}, potem z pamięci podręcznej.", modelPick: "Model",
+        noVision: "LFM3 1.7B przyjmuje tylko tekst. Obrazy obsługuje Qwen3.5.",
         noGpu: "Ta przeglądarka nie udostępnia WebGPU. Użyj aktualnego Chrome lub Edge na komputerze z kartą graficzną.",
         edit: "Zmień", emptyChat: "Załaduj model, wpisz wiadomość poniżej albo wybierz eksperyment z menu.",
         emptyChatB: "Panel B dostaje tę samą wiadomość co A, ale z własnymi ustawieniami.",
@@ -595,16 +611,17 @@
         expLead: "Każdy eksperyment włącza porównanie A/B, ustawia oba panele i wpisuje pytanie. Potem wyślij je – najlepiej kilka razy.",
         apply: "Ustaw", panelA: "A", panelB: "B",
         thParam: "Parametr", thWhat: "Co robi", thTry: "Spróbuj",
-        footer: "edulab · materiał edukacyjny · model: Qwen3.5 0.8B (Apache 2.0), silnik: Transformers.js",
+        footer: "edulab · materiał edukacyjny · modele: Qwen3.5 0.8B (Apache 2.0), LFM3 1.7B (LFM Open License v1.0), silnik: Transformers.js",
         errLoad: "Nie udało się załadować modelu: ",
         liveLoaded: "Model załadowany. Możesz pisać.", liveDone: "Odpowiedź gotowa.",
       },
       en: {
         title: "A small language model in your browser",
-        lead: "Qwen3.5 0.8B runs locally on your graphics card – no server, no API. Same question, two sets of settings, two answers side by side.",
+        lead: "Qwen3.5 0.8B or LFM3 1.7B runs locally on your graphics card – no server, no API. Same question, two sets of settings, two answers side by side.",
         navExp: "Experiments", navSettings: "Settings", navGloss: "Glossary", menu: "Menu",
         stateIdle: "not loaded", stateLoading: "downloading", stateCompiling: "compiling", stateReady: "ready", stateError: "error",
-        load: "Load the model", loadNote: "First download about 850 MB, then from the browser cache.",
+        load: "Load the model", loadNote: "First download about {size}, then from the browser cache.", modelPick: "Model",
+        noVision: "LFM3 1.7B takes text only. Use Qwen3.5 for images.",
         noGpu: "This browser does not expose WebGPU. Use a current Chrome or Edge on a computer with a graphics card.",
         edit: "Change", emptyChat: "Load the model, type a message below or pick an experiment from the menu.",
         emptyChatB: "Panel B gets the same message as A, with its own settings.",
@@ -633,7 +650,7 @@
         expLead: "Each experiment turns on the A/B comparison, sets both panels and fills in a question. Then send it – ideally several times.",
         apply: "Set", panelA: "A", panelB: "B",
         thParam: "Parameter", thWhat: "What it does", thTry: "Try",
-        footer: "edulab · educational material · model: Qwen3.5 0.8B (Apache 2.0), runtime: Transformers.js",
+        footer: "edulab · educational material · models: Qwen3.5 0.8B (Apache 2.0), LFM3 1.7B (LFM Open License v1.0), runtime: Transformers.js",
         errLoad: "Could not load the model: ",
         liveLoaded: "Model loaded. You can type.", liveDone: "Answer ready.",
       },
@@ -679,7 +696,7 @@
         ["Dekodowanie", "Deterministyczne (greedy) = zawsze najbardziej prawdopodobny token. Losowe = próbkowanie z rozkładu.", "To samo pytanie ×3 w obu trybach."],
         ["Temperatura", "Spłaszcza (wysoka) lub wyostrza (niska) rozkład prawdopodobieństw przed losowaniem.", "0.3 kontra 1.8 na kreatywnym zadaniu."],
         ["Maks. tokenów", "Twardy limit długości odpowiedzi.", "25 tokenów i poproś o opis miasta."],
-        ["Obraz", "Model jest wielomodalny: obraz zamienia się na tokeny wizyjne (448×448).", "Dołącz zdjęcie i poproś o opis po polsku."],
+        ["Obraz", "Qwen3.5 jest wielomodalny: obraz zamienia się na tokeny wizyjne (448×448). LFM3 1.7B przyjmuje tylko tekst.", "Dołącz zdjęcie i poproś o opis po polsku."],
         ["Ziarno losowości (seed)", "Niedostępne w tej bibliotece: losowanie korzysta z Math.random, więc wyników z losowaniem nie da się odtworzyć.", "Użyj dekodowania deterministycznego, gdy potrzebujesz powtarzalności."],
       ],
       en: [
@@ -689,7 +706,7 @@
         ["Decoding", "Deterministic (greedy) = always the most likely token. Random = sampling from the distribution.", "Same question ×3 in both modes."],
         ["Temperature", "Flattens (high) or sharpens (low) the probability distribution before sampling.", "0.3 versus 1.8 on a creative task."],
         ["Max tokens", "Hard limit on answer length.", "25 tokens and ask for a city description."],
-        ["Image", "The model is multimodal: an image becomes vision tokens (448×448).", "Attach a photo and ask for a description in Polish."],
+        ["Image", "Qwen3.5 is multimodal: an image becomes vision tokens (448×448). LFM3 1.7B takes text only.", "Attach a photo and ask for a description in Polish."],
         ["Random seed", "Not available in this library: sampling uses Math.random, so random results cannot be reproduced.", "Use deterministic decoding when you need repeatability."],
       ],
     };
@@ -700,7 +717,8 @@
       status: "idle",            // idle | loading | compiling | ready | generating | error
       compare: 0,
       editing: "a",
-      processor: null, model: null,
+      modelKey: MODEL_DEFAULT,   // picked in the model bar; S.model is loaded only for this key
+      processor: null, tokenizer: null, model: null,
       panels: { a: { ...PANEL_DEFAULT, history: [] }, b: { ...PANEL_DEFAULT, history: [] } },
       attached: null,
       stopper: null, abortRun: false,
@@ -711,7 +729,7 @@
     const $ = (id) => document.getElementById(id);
     const el = {
       body: document.body, live: $("live"),
-      modelChip: $("modelChip"), modelBody: $("modelBody"), modelNote: $("modelNote"), btnLoad: $("btnLoad"),
+      modelChip: $("modelChip"), modelBody: $("modelBody"), modelNote: $("modelNote"), btnLoad: $("btnLoad"), modelTitle: $("modelTitle"), modelPick: $("modelPick"),
       progressWrap: $("progressWrap"), progressBar: $("progressBar"), progressFile: $("progressFile"), progressPct: $("progressPct"),
       gpuWarn: $("gpuWarn"), loadError: $("loadError"), loadErrorText: $("loadErrorText"),
       panels: { a: document.querySelector('[data-panel="a"]'), b: document.querySelector('[data-panel="b"]') },
@@ -732,6 +750,7 @@
     const activePanels = () => (S.compare ? ["a", "b"] : ["a"]);
     const sysOf = (p) => (p.sys && p.sys.trim()) ? p.sys.trim() : SYS_DEFAULT[S.lang];
     const localized = (v) => (v && typeof v === "object") ? v[S.lang] : v;
+    const curModel = () => MODELS[S.modelKey];
 
     function setStatus(status) {
       S.status = status;
@@ -748,7 +767,9 @@
       el.btnSend.hidden = status === "generating";
       el.btnStop.hidden = status !== "generating";
       el.btnRepeat.disabled = !ready;
-      el.btnAttach.disabled = !ready;
+      el.btnAttach.disabled = !ready || !curModel().vision;
+      el.btnAttach.title = curModel().vision ? "" : t("noVision");
+      el.modelPick.querySelectorAll("button").forEach((b) => { b.disabled = ["loading", "compiling", "generating"].includes(status); });
       el.msgInput.disabled = !(ready || status === "generating");
       updateSendState();
     }
@@ -771,6 +792,15 @@
       renderSummaries();
     }
 
+    // Qwen3.5 renders the template to text and tokenizes it with the processor (images included);
+    // LFM3 tokenizes straight from the template, which already starts with the BOS token.
+    async function encodePrompt(messages, thinking, image) {
+      const opts = { add_generation_prompt: true, enable_thinking: thinking };
+      if (!curModel().vision) return S.tokenizer.apply_chat_template(messages, { ...opts, return_dict: true });
+      const prompt = S.processor.apply_chat_template(messages, opts);
+      return image ? S.processor(prompt, [image.raw]) : S.processor(prompt);
+    }
+
     function buildGenerationOptions(p) {
       const sampling = Number(p.sample) === 1;
       const opts = { max_new_tokens: p.maxTok, do_sample: sampling };
@@ -785,6 +815,22 @@
     }
 
     // ─── Render ───
+    function renderModelBar() {
+      const m = curModel();
+      el.modelTitle.textContent = `${m.name} · ${m.size} · WebGPU`;
+      el.modelNote.textContent = t("loadNote").replace("{size}", m.download[S.lang]);
+      el.modelPick.setAttribute("aria-label", t("modelPick"));
+      if (!el.modelPick.children.length) {
+        el.modelPick.innerHTML = Object.entries(MODELS).map(([key, x]) => `<button type="button" data-model="${key}">${x.name} ${x.size}</button>`).join("");
+      }
+      el.modelPick.querySelectorAll("[data-model]").forEach((b) => {
+        const on = b.dataset.model === S.modelKey;
+        b.classList.toggle("active", on); b.setAttribute("aria-pressed", String(on));
+      });
+      el.body.dataset.model = S.modelKey;
+      setStatus(S.status);
+    }
+
     function applyI18n() {
       document.documentElement.lang = S.lang;
       el.body.dataset.lang = S.lang;
@@ -793,7 +839,7 @@
       document.querySelectorAll("[data-i18n-html]").forEach((n) => { n.innerHTML = t(n.dataset.i18nHtml); });
       document.querySelectorAll("[data-i18n-placeholder]").forEach((n) => { n.placeholder = t(n.dataset.i18nPlaceholder); });
       document.querySelectorAll("[data-lang-btn]").forEach((b) => b.classList.toggle("active", b.dataset.langBtn === S.lang));
-      setStatus(S.status);
+      renderModelBar();
       setCompare(S.compare);
       renderTiles();
       renderGlossary();
@@ -900,7 +946,8 @@
     function renderAssistant(node, fullText, thinking, done) {
       const body = node.querySelector(".body");
       const thinkEl = node.querySelector(".think");
-      if (thinking) {
+      // LFM3 sometimes reasons even with thinking off; whatever precedes </think> still goes to the reasoning block.
+      if (thinking || fullText.includes("</think>")) {
         const { think, answer, open } = splitThinking(fullText);
         thinkEl.hidden = false;
         thinkEl.querySelector(".think-body").textContent = think;
@@ -926,6 +973,8 @@
       if (tokens != null && seconds > 0) { const tps = tokens / seconds; parts.push(`${tps.toFixed(1)} ${t("mTps")}`); node.dataset.tps = tps.toFixed(1); }
       if (stopped) parts.push(t("stopped"));
       parts.push(Number(p.sample) ? `T ${p.temp}` : t("sumDet"));
+      parts.push(`${curModel().name} ${curModel().size}`);
+      node.dataset.model = S.modelKey;
       meta.innerHTML = parts.map((x) => `<span>${escapeHtml(x)}</span>`).join("");
     }
 
@@ -946,13 +995,15 @@
         renderProgress();
       };
       try {
-        S.processor = await AutoProcessor.from_pretrained(MODEL_ID, { progress_callback });
-        S.model = await Qwen3_5ForConditionalGeneration.from_pretrained(MODEL_ID, { dtype: DTYPE, device: "webgpu", progress_callback });
+        const m = curModel();
+        if (m.vision) { S.processor = await AutoProcessor.from_pretrained(m.id, { progress_callback }); S.tokenizer = S.processor.tokenizer; }
+        else { S.processor = null; S.tokenizer = await AutoTokenizer.from_pretrained(m.id, { progress_callback }); }
+        S.model = await m.Model.from_pretrained(m.id, { dtype: m.dtype, device: "webgpu", progress_callback });
         setStatus("compiling");
         el.progressFile.textContent = t("stateCompiling");
-        const warm = S.processor.apply_chat_template([{ role: "user", content: [{ type: "text", text: "Hi" }] }], { add_generation_prompt: true, enable_thinking: false });
-        const warmInputs = await S.processor(warm);
+        const warmInputs = await encodePrompt([{ role: "user", content: [{ type: "text", text: "Hi" }] }], false, null);
         await S.model.generate({ ...warmInputs, max_new_tokens: 1 });
+        el.body.dataset.loadedModel = S.modelKey;
         el.progressWrap.hidden = true;
         el.modelBody.hidden = true;
         setStatus("ready");
@@ -987,10 +1038,9 @@
       const t0 = performance.now();
       let full = "";
       try {
-        const prompt = S.processor.apply_chat_template(messages, { add_generation_prompt: true, enable_thinking: thinking });
-        const inputs = image ? await S.processor(prompt, [image.raw]) : await S.processor(prompt);
+        const inputs = await encodePrompt(messages, thinking, image);
         const inputLen = inputs.input_ids.dims.at(-1);
-        const streamer = new TextStreamer(S.processor.tokenizer, {
+        const streamer = new TextStreamer(S.tokenizer, {
           skip_prompt: true, skip_special_tokens: true,
           callback_function: (chunk) => { full += chunk; renderAssistant(node, full, thinking, false); },
         });
@@ -1000,7 +1050,7 @@
         renderAssistant(node, full, thinking, true);
         finishMessage(node, p, { tokens: newTokens, seconds: (performance.now() - t0) / 1000, stopped });
         if (memory) {
-          const answer = thinking ? splitThinking(full).answer : full;
+          const answer = (thinking || full.includes("</think>")) ? splitThinking(full).answer : full;
           p.history.push({ role: "user", content: [{ type: "text", text: userText }] });
           p.history.push({ role: "assistant", content: [{ type: "text", text: answer }] });
         }
@@ -1083,6 +1133,19 @@
       $(id).showModal();
     }
 
+    // Switching frees the loaded model (GPU memory) and goes back to idle; the chat stays for comparison.
+    async function selectModel(key) {
+      if (key === S.modelKey || !MODELS[key] || ["loading", "compiling", "generating"].includes(S.status)) return;
+      S.modelKey = key;
+      try { localStorage.setItem(MODEL_KEY, key); } catch (_) {}
+      if (S.model) { const old = S.model; S.model = null; S.processor = null; S.tokenizer = null; delete el.body.dataset.loadedModel; try { await old.dispose(); } catch (_) {} }
+      if (!curModel().vision) detachImage();
+      el.loadError.hidden = true;
+      el.modelBody.hidden = !!navigator.gpu;
+      setStatus("idle");
+      renderModelBar();
+    }
+
     // ─── Listeners ───
     const btnMenu = $("btnMenu");
     const setMenu = (open) => { el.body.dataset.menu = open ? "1" : "0"; btnMenu.setAttribute("aria-expanded", String(!!open)); };
@@ -1111,6 +1174,7 @@
     el.btnReset.addEventListener("click", resetPanel);
     el.btnCompare.addEventListener("click", () => setCompare(!S.compare));
     el.btnLoad.addEventListener("click", loadModel);
+    el.modelPick.addEventListener("click", (e) => { const b = e.target.closest("[data-model]"); if (b) selectModel(b.dataset.model); });
     el.btnSend.addEventListener("click", () => sendFromComposer(1));
     el.btnRepeat.addEventListener("click", () => sendFromComposer(3));
     el.btnStop.addEventListener("click", stop);
@@ -1146,6 +1210,7 @@
 
     // ─── Init ───
     try { const saved = localStorage.getItem(LANG_KEY); if (saved === "pl" || saved === "en") S.lang = saved; } catch (_) {}
+    try { const saved = localStorage.getItem(MODEL_KEY); if (MODELS[saved]) S.modelKey = saved; } catch (_) {}
     applyI18n();
     writeSettings();
     renderSummaries();
